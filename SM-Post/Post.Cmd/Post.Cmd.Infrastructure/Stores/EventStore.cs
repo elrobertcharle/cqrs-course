@@ -51,7 +51,7 @@ namespace Post.Cmd.Infrastructure.Stores
                 var eventType = @event.GetType().Name;
                 var eventModel = new EventModel
                 {
-                    TimeStamp = DateTime.Now,
+                    TimeStamp = DateTime.UtcNow,
                     AggregateIdentifier = aggregateId,
                     AggregateType = nameof(PostAggregate),
                     Version = version,

@@ -15,8 +15,12 @@ using Post.Query.Infrastructure.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 Action<DbContextOptionsBuilder> configureDbContext = o => o.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
-builder.Services.AddDbContext<DatabaseContext>(configureDbContext);
-builder.Services.AddSingleton(new DatabaseContextFactory(configureDbContext));
+Action<DbContextOptionsBuilder> configureDbContextPsql = o => o.UseLazyLoadingProxies().UseNpgsql(builder.Configuration.GetConnectionString("PostgresSql"));
+
+//builder.Services.AddDbContext<DatabaseContext>(configureDbContext);
+builder.Services.AddDbContext<DatabaseContext>(configureDbContextPsql);
+//builder.Services.AddSingleton(new DatabaseContextFactory(configureDbContext));
+builder.Services.AddSingleton(new DatabaseContextFactory(configureDbContextPsql));
 
 var databaseContext = builder.Services.BuildServiceProvider().GetRequiredService<DatabaseContext>();
 databaseContext.Database.EnsureCreated();

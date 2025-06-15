@@ -25,7 +25,7 @@ namespace Post.Cmd.Domain.Aggregates
                 Id = id,
                 Author = author,
                 Message = message,
-                DatePosted = DateTime.Now
+                DatePosted = DateTime.UtcNow
             });
         }
 
@@ -101,7 +101,7 @@ namespace Post.Cmd.Domain.Aggregates
                 CommentId = Guid.NewGuid(),
                 CommentText = comment,
                 Username = username,
-                CommentDate = DateTime.Now
+                CommentDate = DateTime.UtcNow
             });
         }
 
@@ -132,7 +132,7 @@ namespace Post.Cmd.Domain.Aggregates
                 CommentId = commentId,
                 CommentText = comment,
                 Username = username,
-                EditDate = DateTime.Now
+                EditDate = DateTime.UtcNow
             });
         }
 
