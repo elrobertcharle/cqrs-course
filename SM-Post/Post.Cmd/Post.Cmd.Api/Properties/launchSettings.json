@@ -1,0 +1,23 @@
+{
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "KAFKA_TOPIC": "sm-post"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5230"
+    },
+    "https": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "KAFKA_TOPIC": "sm-post"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7235;http://localhost:5230"
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
+}

@@ -1,0 +1,16 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo_container
+    ports: 
+      - 27017:27017
+    volumes:
+      - db-data:/data/db
+    environment: # Optional: Sets environment variables for the container
+      - MONGO_INITDB_ROOT_USERNAME=admin # Example: sets the initial root username
+      - MONGO_INITDB_ROOT_PASSWORD=password # Example: sets the initial root password
+
+
+volumes:
+  db-data:
+    driver: local
