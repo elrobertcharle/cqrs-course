@@ -32,7 +32,7 @@ namespace Post.Cmd.Infrastructure.Handlers
                 return aggregate;
 
             aggregate.ReplayEvents(events);
-            aggregate.Version = events[^1].Version; // roberto: creo que la version debe ser establecida dentro de replay
+            aggregate.Version = events[^1].Version; // roberto: creo que la version debe ser establecida dentro de replay.
             return aggregate;
         }
 
