@@ -16,6 +16,9 @@ namespace Post.Common.Events
         }
 
         [BsonRepresentation(BsonType.String)]
+        public Guid PostId { get; set; }
+
+        [BsonRepresentation(BsonType.String)]
         public Guid CommentId { get; set; }
     }
 }

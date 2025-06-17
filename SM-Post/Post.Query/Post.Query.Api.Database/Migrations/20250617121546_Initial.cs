@@ -33,6 +33,7 @@ namespace Post.Query.Api.Database.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Username = table.Column<string>(type: "text", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Comment = table.Column<string>(type: "text", nullable: false),
                     Edited = table.Column<bool>(type: "boolean", nullable: false),
                     PostId = table.Column<Guid>(type: "uuid", nullable: false)

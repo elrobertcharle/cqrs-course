@@ -1,4 +1,6 @@
 ﻿using CQRS.Core.Events;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +15,13 @@ namespace Post.Common.Events
         {
         }
 
+        [BsonRepresentation(BsonType.String)]
+        public Guid PostId { get; set; }
+
         public string Author { get; set; } = null!;
+
         public string Message { get; set; } = null!;
+
         public DateTime DatePosted { get; set; }
     }
 }

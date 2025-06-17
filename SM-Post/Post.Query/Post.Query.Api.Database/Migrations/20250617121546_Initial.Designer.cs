@@ -12,7 +12,7 @@ using Post.Query.Api.Database;
 namespace Post.Query.Api.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250617105221_Initial")]
+    [Migration("20250617121546_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -43,6 +43,9 @@ namespace Post.Query.Api.Database.Migrations
 
                     b.Property<Guid>("PostId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Username")
                         .IsRequired()

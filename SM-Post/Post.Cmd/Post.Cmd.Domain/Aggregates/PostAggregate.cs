@@ -22,7 +22,7 @@ namespace Post.Cmd.Domain.Aggregates
         {
             RaiseEvent(new PostCreatedEvent
             {
-                Id = id,
+                PostId = id,
                 Author = author,
                 Message = message,
                 DatePosted = DateTime.UtcNow
@@ -31,7 +31,7 @@ namespace Post.Cmd.Domain.Aggregates
 
         public void Apply(PostCreatedEvent @event)
         {
-            _id = @event.Id;
+            _id = @event.PostId;
             _active = true;
             _author = @event.Author;
         }
@@ -49,16 +49,16 @@ namespace Post.Cmd.Domain.Aggregates
             if (string.IsNullOrWhiteSpace(message))
                 throw new InvalidOperationException();
 
-            RaiseEvent(new MessageUpdatedEvent
+            RaiseEvent(new PostMessageUpdatedEvent
             {
-                Id = _id,
+                PostId = _id,
                 Message = message
             });
         }
 
-        public void Apply(MessageUpdatedEvent @event)
+        public void Apply(PostMessageUpdatedEvent @event)
         {
-            _id = @event.Id;
+            _id = @event.PostId;
         }
 
         /// <summary>
@@ -72,13 +72,13 @@ namespace Post.Cmd.Domain.Aggregates
 
             RaiseEvent(new PostLikedEvent
             {
-                Id = _id
+                PostId = _id
             });
         }
 
         public void Apply(PostLikedEvent @event)
         {
-            _id = @event.Id;
+            _id = @event.PostId;
         }
 
         /// <summary>
@@ -97,17 +97,17 @@ namespace Post.Cmd.Domain.Aggregates
 
             RaiseEvent(new CommentAddedEvent
             {
-                Id = _id,
+                PostId = _id,
                 CommentId = Guid.NewGuid(),
                 CommentText = comment,
                 Username = username,
-                CommentDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow
             });
         }
 
         public void Apply(CommentAddedEvent @event)
         {
-            _id = @event.Id;
+            _id = @event.PostId;
             _comments.Add(@event.CommentId, new Tuple<string, string>(@event.CommentText, @event.Username));
         }
 
@@ -128,17 +128,17 @@ namespace Post.Cmd.Domain.Aggregates
 
             RaiseEvent(new CommentUpdatedEvent
             {
-                Id = _id,
+                PostId = _id,
                 CommentId = commentId,
                 CommentText = comment,
                 Username = username,
-                EditDate = DateTime.UtcNow
+                UpdatedDate = DateTime.UtcNow
             });
         }
 
         public void Apply(CommentUpdatedEvent @event)
         {
-            _id = @event.Id;
+            _id = @event.PostId;
             _comments[@event.CommentId] = new Tuple<string, string>(@event.CommentText, @event.Username);
         }
 
@@ -161,14 +161,14 @@ namespace Post.Cmd.Domain.Aggregates
 
             RaiseEvent(new CommentRemovedEvent
             {
-                Id = _id,
+                PostId = _id,
                 CommentId = commentId
             });
         }
 
         public void Apply(CommentRemovedEvent @event)
         {
-            _id = @event.Id;
+            _id = @event.PostId;
             _comments.Remove(@event.CommentId);
         }
 
@@ -190,13 +190,13 @@ namespace Post.Cmd.Domain.Aggregates
 
             RaiseEvent(new PostRemovedEvent
             {
-                Id = _id
+                PostId = _id
             });
         }
 
         public void Apply(PostRemovedEvent @event)
         {
-            _id = @event.Id;
+            _id = @event.PostId;
             _active = false;
         }
     }

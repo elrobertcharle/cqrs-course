@@ -18,6 +18,8 @@ namespace Post.Query.Api.Database.Entities
 
         public DateTime CreatedDate { get; set; }
 
+        public DateTime UpdatedDate { get; set; }
+
         public string Comment { get; set; } = null!;
 
         public bool Edited { get; set; }

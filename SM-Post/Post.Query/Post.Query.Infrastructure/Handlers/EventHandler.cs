@@ -25,7 +25,7 @@ namespace Post.Query.Infrastructure.Handlers
         {
             var post = new PostEntity
             {
-                Id = @event.Id,
+                Id = @event.PostId,
                 Author = @event.Author,
                 CreatedDate = @event.DatePosted,
                 Message = @event.Message
@@ -34,18 +34,18 @@ namespace Post.Query.Infrastructure.Handlers
             await _postRepository.CreateAsync(post);
         }
 
-        public async Task On(MessageUpdatedEvent @event)
+        public async Task On(PostMessageUpdatedEvent @event)
         {
-            var post = await _postRepository.GetByIdAsync(@event.Id); //roberto: no queda claro que el id del evento sea el id de la entidad. I dont like this
+            var post = await _postRepository.GetByIdAsync(@event.PostId); //roberto: no queda claro que el id del evento sea el id de la entidad. I dont like this
             if (post == null)
-                throw new InvalidOperationException($"The post with Id={@event.Id} does not exist.");
+                throw new InvalidOperationException($"The post with Id={@event.PostId} does not exist.");
             post.Message = @event.Message;
             await _postRepository.UpdateAsync(post);
         }
 
         public async Task On(PostLikedEvent @event)
         {
-            var post = await _postRepository.GetByIdAsync(@event.Id); //roberto: no queda claro que el id del evento sea el id de la entidad. I dont like this
+            var post = await _postRepository.GetByIdAsync(@event.PostId); //roberto: no queda claro que el id del evento sea el id de la entidad. I dont like this
             if (post == null)
                 return;
             post.Likes++;
@@ -56,9 +56,9 @@ namespace Post.Query.Infrastructure.Handlers
         {
             var comment = new CommentEntity
             {
-                PostId = @event.Id,
+                PostId = @event.PostId,
                 Id = @event.CommentId,
-                CreatedDate = @event.CommentDate,
+                CreatedDate = @event.CreatedDate,
                 Comment = @event.CommentText,
                 Username = @event.Username,
                 Edited = false
@@ -75,7 +75,7 @@ namespace Post.Query.Infrastructure.Handlers
 
             comment.Comment = @event.CommentText;
             comment.Edited = true;
-            comment.CreatedDate = @event.EditDate;
+            comment.UpdatedDate = @event.UpdatedDate;
 
             await _commentRepository.UpdateAsync(comment);
         }
@@ -87,7 +87,7 @@ namespace Post.Query.Infrastructure.Handlers
 
         public async Task On(PostRemovedEvent @event)
         {
-            await _postRepository.DeleteAsync(@event.Id);
+            await _postRepository.DeleteAsync(@event.PostId);
         }
     }
 }

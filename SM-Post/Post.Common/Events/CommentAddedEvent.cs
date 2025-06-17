@@ -16,9 +16,15 @@ namespace Post.Common.Events
         }
 
         [BsonRepresentation(BsonType.String)]
+        public Guid PostId { get; set; }
+
+        [BsonRepresentation(BsonType.String)]
         public Guid CommentId { get; set; }
+
         public string CommentText { get; set; } = null!;
+
         public string Username { get; set; } = null!;
-        public DateTime CommentDate { get; set; }
+
+        public DateTime CreatedDate { get; set; }
     }
 }

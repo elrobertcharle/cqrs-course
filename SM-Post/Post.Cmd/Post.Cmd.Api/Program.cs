@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 BsonClassMap.RegisterClassMap<BaseEvent>();
 BsonClassMap.RegisterClassMap<PostCreatedEvent>();
-BsonClassMap.RegisterClassMap<MessageUpdatedEvent>();
+BsonClassMap.RegisterClassMap<PostMessageUpdatedEvent>();
 BsonClassMap.RegisterClassMap<PostLikedEvent>();
 BsonClassMap.RegisterClassMap<CommentAddedEvent>();
 BsonClassMap.RegisterClassMap<CommentUpdatedEvent>();

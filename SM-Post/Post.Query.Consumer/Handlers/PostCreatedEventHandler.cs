@@ -22,7 +22,7 @@ namespace Post.Query.Consumer.Handlers
         {
             var post = new PostEntity
             {
-                Id = @event.Id,
+                Id = @event.PostId,
                 Author = @event.Author,
                 CreatedDate = @event.DatePosted,
                 Message = @event.Message

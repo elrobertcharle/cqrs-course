@@ -28,7 +28,7 @@ namespace Post.Query.Consumer
             return typeDiscriminator switch
             {
                 nameof(PostCreatedEvent) => JsonSerializer.Deserialize<PostCreatedEvent>(json, options),
-                nameof(MessageUpdatedEvent) => JsonSerializer.Deserialize<MessageUpdatedEvent>(json, options),
+                nameof(PostMessageUpdatedEvent) => JsonSerializer.Deserialize<PostMessageUpdatedEvent>(json, options),
                 nameof(PostLikedEvent) => JsonSerializer.Deserialize<PostLikedEvent>(json, options),
                 nameof(CommentAddedEvent) => JsonSerializer.Deserialize<CommentAddedEvent>(json, options),
                 nameof(CommentUpdatedEvent) => JsonSerializer.Deserialize<CommentUpdatedEvent>(json, options),

@@ -1,4 +1,6 @@
 ﻿using CQRS.Core.Events;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +14,8 @@ namespace Post.Common.Events
         public PostLikedEvent() : base(nameof(PostLikedEvent))
         {
         }
+
+        [BsonRepresentation(BsonType.String)]
+        public Guid PostId { get; set; }
     }
 }
