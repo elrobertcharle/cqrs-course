@@ -6,17 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Post.Query.Domain.Entities
+namespace Post.Query.Api.Database.Entities
 {
-    [Table("Posts")]
+    [Table("posts")]
     public class PostEntity
     {
         [Key]
-        public Guid PostId { get; set; }
+        public Guid Id { get; set; }
         public string Author { get; set; } = null!;
-        public DateTime DatePosted { get; set; }
+        public DateTime CreatedDate { get; set; }
         public string Message { get; set; } = null!;
         public int Likes { get; set; }
-        public virtual ICollection<CommentEntity> Comments { get; set; } = null!;
+        public ICollection<CommentEntity> Comments { get; set; } = null!;
     }
 }

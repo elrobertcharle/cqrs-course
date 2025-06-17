@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Post.Common.Events;
-using Post.Query.Domain.Entities;
+using Post.Query.Api.Database.Entities;
 using Post.Query.Domain.Repositories;
 using System;
 using System.Collections.Generic;
@@ -25,9 +25,9 @@ namespace Post.Query.Infrastructure.Handlers
         {
             var post = new PostEntity
             {
-                PostId = @event.Id,
+                Id = @event.Id,
                 Author = @event.Author,
-                DatePosted = @event.DatePosted,
+                CreatedDate = @event.DatePosted,
                 Message = @event.Message
             };
 
@@ -57,8 +57,8 @@ namespace Post.Query.Infrastructure.Handlers
             var comment = new CommentEntity
             {
                 PostId = @event.Id,
-                CommentId = @event.CommentId,
-                CommentDate = @event.CommentDate,
+                Id = @event.CommentId,
+                CreatedDate = @event.CommentDate,
                 Comment = @event.CommentText,
                 Username = @event.Username,
                 Edited = false
@@ -75,7 +75,7 @@ namespace Post.Query.Infrastructure.Handlers
 
             comment.Comment = @event.CommentText;
             comment.Edited = true;
-            comment.CommentDate = @event.EditDate;
+            comment.CreatedDate = @event.EditDate;
 
             await _commentRepository.UpdateAsync(comment);
         }

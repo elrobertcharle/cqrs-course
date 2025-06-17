@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Post.Query.Domain.Entities;
+using Post.Query.Api.Database;
+using Post.Query.Api.Database.Entities;
 using Post.Query.Domain.Repositories;
 using Post.Query.Infrastructure.DataAccess;
 using System;
@@ -40,7 +41,7 @@ namespace Post.Query.Infrastructure.Repositories
         public async Task<CommentEntity?> GetByIdAsync(Guid commentId)
         {
             using var context = _contextFactory.CreateContext();
-            return await context.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
+            return await context.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
         }
 
         public async Task UpdateAsync(CommentEntity comment)

@@ -2,9 +2,11 @@ using Confluent.Kafka;
 using CQRS.Core.Consumers;
 using CQRS.Core.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Post.Query.Api.Database;
+using Post.Query.Api.Database.Entities;
 using Post.Query.Api.Middleware;
 using Post.Query.Api.Queries;
-using Post.Query.Domain.Entities;
+//using Post.Query.Domain.Entities;
 using Post.Query.Domain.Repositories;
 using Post.Query.Infrastructure.Consumers;
 using Post.Query.Infrastructure.DataAccess;
@@ -14,16 +16,15 @@ using Post.Query.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Action<DbContextOptionsBuilder> configureDbContext = o => o.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
-Action<DbContextOptionsBuilder> configureDbContextPsql = o => o.UseLazyLoadingProxies().UseNpgsql(builder.Configuration.GetConnectionString("PostgresSql"));
+Action<DbContextOptionsBuilder> configureDbContext = o => o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
+Action<DbContextOptionsBuilder> configureDbContextPsql = o => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSql"));
 
 //builder.Services.AddDbContext<DatabaseContext>(configureDbContext);
-builder.Services.AddDbContext<DatabaseContext>(configureDbContextPsql);
+builder.Services.AddDbContext<Post.Query.Api.Database.DatabaseContext>(configureDbContextPsql);
 //builder.Services.AddSingleton(new DatabaseContextFactory(configureDbContext));
 builder.Services.AddSingleton(new DatabaseContextFactory(configureDbContextPsql));
 
 var databaseContext = builder.Services.BuildServiceProvider().GetRequiredService<DatabaseContext>();
-databaseContext.Database.EnsureCreated();
 
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
@@ -42,7 +43,7 @@ dispatcher.RegisterHandler<FindPostsWithLikesQuery>(queryHandler.HandleAsync);
 
 builder.Services.AddSingleton<IQueryDispatcher<PostEntity>>(dispatcher);
 
-builder.Services.AddHostedService<ConsumerHostService>();
+//builder.Services.AddHostedService<ConsumerHostService>();
 
 builder.Services.AddControllers();
 
