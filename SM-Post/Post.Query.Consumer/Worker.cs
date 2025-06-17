@@ -30,45 +30,74 @@ namespace Post.Query.Consumer
             using var consumer = new ConsumerBuilder<Ignore, string>(_kafkaConfig.ConsumerConfig).Build();
             consumer.Subscribe(_kafkaConfig.Topic);
 
-            while (!ct.IsCancellationRequested)
+            try
             {
-                var cr = consumer.Consume(ct);
-
-                var options = new JsonSerializerOptions { Converters = { new EventJsonConverter() } };
-                var @event = JsonSerializer.Deserialize<BaseEvent>(cr.Message.Value, options);
-                if (@event == null)
+                while (!ct.IsCancellationRequested)
                 {
-                    _logger.LogWarning("Null event arrived. {KafkaTopic}", _kafkaConfig.Topic);
-                    continue;
-                }
+                    try
+                    {
+                        ConsumeResult<Ignore, string>? cr = null;
+                        try
+                        {
+                            cr = consumer.Consume(ct);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            break;
+                        }
 
-                var eventType = @event.GetType();
-                var handlerType = typeof(IEventHandler<>).MakeGenericType(eventType);
-                using var scope = _serviceScopeFactory.CreateScope();
-                var handler = scope.ServiceProvider.GetService(handlerType);
-                if (handler == null)
-                {
-                    _logger.LogError("Handler not found. {ExpectedHandlerType}, {EventType}", handlerType, eventType);
-                    continue;
-                }
+                        if (cr == null || cr.Message == null)
+                        {
+                            _logger.LogWarning("Null message received from Kafka. Topic: {KafkaTopic}", _kafkaConfig.Topic);
+                            continue;
+                        }
 
-                var method = handlerType.GetMethod("HandleAsync");
-                if (method == null)
-                {
-                    _logger.LogError("HandleAsync method not found on {HandlerType}", handlerType);
-                    continue;
-                }
+                        var options = new JsonSerializerOptions { Converters = { new EventJsonConverter() } };
+                        var @event = JsonSerializer.Deserialize<BaseEvent>(cr.Message.Value, options);
+                        if (@event == null)
+                        {
+                            _logger.LogWarning("Null event deserialized. Topic: {KafkaTopic}", _kafkaConfig.Topic);
+                            continue;
+                        }
 
+                        var eventType = @event.GetType();
+                        var handlerType = typeof(IEventHandler<>).MakeGenericType(eventType);
+                        using var scope = _serviceScopeFactory.CreateScope();
+                        var handler = scope.ServiceProvider.GetService(handlerType);
+                        if (handler == null)
+                        {
+                            _logger.LogError("Handler not found. Expected: {ExpectedHandlerType}, Event: {EventType}", handlerType, eventType);
+                            continue;
+                        }
+
+                        var method = handlerType.GetMethod("HandleAsync");
+                        if (method == null)
+                        {
+                            _logger.LogError("HandleAsync method not found on {HandlerType}", handlerType);
+                            continue;
+                        }
+
+                        var task = (Task?)method.Invoke(handler, [@event, ct]);
+                        if (task != null)
+                            await task;
+
+                        consumer.Commit(cr);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Unhandled error in Kafka processing loop.");
+                    }
+                }
+            }
+            finally
+            {
                 try
                 {
-                    var task = (Task?)method.Invoke(handler, new object[] { @event, ct });
-                    if (task != null)
-                        await task;
-                    consumer.Commit(cr);
+                    consumer.Close(); // Leaves the group cleanly and commits offsets
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error invoking handler for event type {EventType}", eventType);
+                    _logger.LogWarning(ex, "Exception during Kafka consumer close.");
                 }
             }
         }
