@@ -28,6 +28,7 @@ namespace Post.Cmd.Api.Controllers
 
             return StatusCode(StatusCodes.Status201Created, new NewPostResponse
             {
+                Id = postId,
                 Message = "Created"
             });
         }
