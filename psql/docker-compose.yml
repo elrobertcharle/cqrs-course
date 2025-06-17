@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: pass#4o&6
-      POSTGRES_DB: your_database
+      POSTGRES_DB: SocialMedia
     ports:
       - "5432:5432"
     volumes:
