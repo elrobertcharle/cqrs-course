@@ -41,7 +41,7 @@ namespace Post.Query.Infrastructure.Repositories
         public async Task<PostEntity?> GetByIdAsync(Guid postId)
         {
             using DatabaseContext context = _contextFactory.CreateContext();
-            return await context.Posts.Include(p => p.Comments).FirstOrDefaultAsync();
+            return await context.Posts.Include(p => p.Comments).FirstOrDefaultAsync(p => p.Id == postId);
         }
 
         public async Task<List<PostEntity>> ListAllAsync()
