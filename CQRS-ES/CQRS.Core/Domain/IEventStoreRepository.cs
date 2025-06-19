@@ -9,8 +9,8 @@ namespace CQRS.Core.Domain
 {
     public interface IEventStoreRepository
     {
-        Task SaveAsync(EventModel @event);
-        Task<List<EventModel>> FindByAggregateId(Guid aggregateId);
-        Task<List<EventModel>> FindAllAsync();
+        Task SaveAsync(EventModel @event, CancellationToken ct);
+        Task<List<EventModel>> FindByAggregateIdAsync(Guid aggregateId, CancellationToken ct);
+        Task<List<EventModel>> FindAllAsync(CancellationToken ct);
     }
 }

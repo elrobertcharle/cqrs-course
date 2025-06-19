@@ -1,4 +1,5 @@
 ﻿using CQRS.Core.Infrastructure;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Post.Cmd.Api.Commands;
 using Post.Cmd.Api.DTOs;
@@ -10,21 +11,21 @@ namespace Post.Cmd.Api.Controllers
     public class NewPostController : ControllerBase
     {
         private readonly ILogger<NewPostController> _logger;
-        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IMediator _mediator;
 
-        public NewPostController(ILogger<NewPostController> logger, ICommandDispatcher commandDispatcher)
+        public NewPostController(ILogger<NewPostController> logger, IMediator mediator)
         {
             _logger = logger;
-            _commandDispatcher = commandDispatcher;
+            _mediator = mediator;
         }
 
         [HttpPost]
-        public async Task<IActionResult> NewPost(NewPostCommand command)
+        public async Task<IActionResult> NewPost(NewPostCommand command, CancellationToken ct)
         {
             var postId = Guid.NewGuid();
             command.Id = postId;
 
-            await _commandDispatcher.SendAsync(command);
+            await _mediator.Send(command, ct);
 
             return StatusCode(StatusCodes.Status201Created, new NewPostResponse
             {

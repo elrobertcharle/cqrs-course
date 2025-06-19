@@ -23,19 +23,19 @@ namespace Post.Cmd.Infrastructure.Repositories
             _eventStoreCollection = mongoDatabase.GetCollection<EventModel>(config.Value.Collection);
         }
 
-        public async Task<List<EventModel>> FindAllAsync()
+        public async Task<List<EventModel>> FindAllAsync(CancellationToken ct)
         {
-            return await _eventStoreCollection.Find(_ => true).ToListAsync().ConfigureAwait(false);
+            return await _eventStoreCollection.Find(_ => true).ToListAsync(ct).ConfigureAwait(false);
         }
 
-        public async Task<List<EventModel>> FindByAggregateId(Guid aggregateId)
+        public async Task<List<EventModel>> FindByAggregateIdAsync(Guid aggregateId, CancellationToken ct)
         {
-            return await _eventStoreCollection.Find(x => x.AggregateIdentifier == aggregateId).ToListAsync().ConfigureAwait(false);
+            return await _eventStoreCollection.Find(x => x.AggregateIdentifier == aggregateId).ToListAsync(ct).ConfigureAwait(false);
         }
 
-        public async Task SaveAsync(EventModel @event)
+        public async Task SaveAsync(EventModel @event, CancellationToken ct)
         {
-            await _eventStoreCollection.InsertOneAsync(@event).ConfigureAwait(false);
+            await _eventStoreCollection.InsertOneAsync(@event, cancellationToken: ct).ConfigureAwait(false);
         }
     }
 }

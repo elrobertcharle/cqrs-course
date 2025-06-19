@@ -1,4 +1,6 @@
 ﻿using CQRS.Core.Infrastructure;
+using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Post.Cmd.Api.Commands;
 
@@ -9,19 +11,19 @@ namespace Post.Cmd.Api.Controllers
     public class EditCommentController : ControllerBase
     {
         private readonly ILogger<EditCommentController> _logger;
-        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IMediator _mediator;
 
-        public EditCommentController(ILogger<EditCommentController> logger, ICommandDispatcher commandDispatcher)
+        public EditCommentController(ILogger<EditCommentController> logger, IMediator mediator)
         {
             _logger = logger;
-            _commandDispatcher = commandDispatcher;
+            _mediator = mediator;
         }
 
         [HttpPut("{postId}")]
-        public async Task<IActionResult> EditComment(Guid postId, EditCommentCommand command) // roberto: arreglar nombre de parametros en url
+        public async Task<IActionResult> EditComment(Guid postId, EditCommentCommand command, CancellationToken ct) // roberto: arreglar nombre de parametros en url
         {
             command.Id = postId;
-            await _commandDispatcher.SendAsync(command);
+            await _mediator.Send(command, ct);
             return Ok();
         }
     }

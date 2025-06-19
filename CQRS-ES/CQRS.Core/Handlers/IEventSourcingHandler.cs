@@ -9,8 +9,8 @@ namespace CQRS.Core.Handlers
 {
     public interface IEventSourcingHandler<T>
     {
-        Task SaveAsync(AggregateRoot aggregate);
-        Task<T> GetByIdAsync(Guid aggregateId);
-        Task RepublishEventAsync();
+        Task SaveAsync(AggregateRoot aggregate, CancellationToken ct);
+        Task<T> GetByIdAsync(Guid aggregateId, CancellationToken ct);
+        Task RepublishEventAsync(CancellationToken ct);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CQRS.Core.Infrastructure;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Post.Cmd.Api.Commands;
 
@@ -9,18 +10,18 @@ namespace Post.Cmd.Api.Controllers
     public class LikePostController : ControllerBase
     {
         private readonly ILogger<LikePostController> _logger;
-        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IMediator _mediator;
 
-        public LikePostController(ILogger<LikePostController> logger, ICommandDispatcher commandDispatcher)
+        public LikePostController(ILogger<LikePostController> logger, IMediator mediator)
         {
             _logger = logger;
-            _commandDispatcher = commandDispatcher;
+            _mediator = mediator;
         }
 
         [HttpPut("{postId}")]
-        public async Task<IActionResult> LikePost(Guid postId)
+        public async Task<IActionResult> LikePost(Guid postId, CancellationToken ct)
         {
-            await _commandDispatcher.SendAsync(new LikePostCommand { Id = postId });
+            await _mediator.Send(new LikePostCommand { Id = postId }, ct);
 
             return Ok();
         }

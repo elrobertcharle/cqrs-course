@@ -1,4 +1,5 @@
 ﻿using CQRS.Core.Infrastructure;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Post.Cmd.Api.Commands;
 using Post.Cmd.Api.DTOs;
@@ -10,18 +11,18 @@ namespace Post.Cmd.Api.Controllers
     public class RestoreReadDbController : ControllerBase
     {
         private readonly ILogger<RestoreReadDbController> _logger;
-        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IMediator _mediator;
 
-        public RestoreReadDbController(ILogger<RestoreReadDbController> logger, ICommandDispatcher commandDispatcher)
+        public RestoreReadDbController(ILogger<RestoreReadDbController> logger, IMediator mediator)
         {
             _logger = logger;
-            _commandDispatcher = commandDispatcher;
+            _mediator = mediator;
         }
 
         [HttpPost]
-        public async Task<IActionResult> RestoreReadDb()
+        public async Task<IActionResult> RestoreReadDb(CancellationToken ct)
         {
-            await _commandDispatcher.SendAsync(new RestoreReadDbCommand());
+            await _mediator.Send(new RestoreReadDbCommand(), ct);
 
             return Ok();
         }

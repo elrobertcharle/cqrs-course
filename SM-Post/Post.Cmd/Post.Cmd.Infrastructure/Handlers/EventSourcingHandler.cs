@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Post.Cmd.Infrastructure.Handlers
@@ -23,10 +24,10 @@ namespace Post.Cmd.Infrastructure.Handlers
             _eventProducer = eventProducer;
         }
 
-        public async Task<PostAggregate> GetByIdAsync(Guid aggregateId)
+        public async Task<PostAggregate> GetByIdAsync(Guid aggregateId, CancellationToken ct)
         {
             var aggregate = new PostAggregate();
-            var events = await _eventStore.GetEventAsync(aggregateId);
+            var events = await _eventStore.GetEventAsync(aggregateId, ct);
 
             if (events == null || !events.Any())
                 return aggregate;
@@ -36,16 +37,16 @@ namespace Post.Cmd.Infrastructure.Handlers
             return aggregate;
         }
 
-        public async Task RepublishEventAsync()
+        public async Task RepublishEventAsync(CancellationToken ct)
         {
-            var aggregateIds = await _eventStore.GetAggregateIdsAsync();
+            var aggregateIds = await _eventStore.GetAggregateIdsAsync(ct);
             foreach (var aggregateId in aggregateIds)
             {
-                var aggregate = await GetByIdAsync(aggregateId);
+                var aggregate = await GetByIdAsync(aggregateId, ct);
                 if (!aggregate.Active)
                     continue;
 
-                var events = await _eventStore.GetEventAsync(aggregateId);
+                var events = await _eventStore.GetEventAsync(aggregateId, ct);
                 var topic = Environment.GetEnvironmentVariable("KAFKA_TOPIC");
                 if (topic == null)
                     throw new InvalidOperationException("Topic has not been set. env var KAFKA_TOPIC.");
@@ -54,9 +55,9 @@ namespace Post.Cmd.Infrastructure.Handlers
             }
         }
 
-        public async Task SaveAsync(AggregateRoot aggregate)
+        public async Task SaveAsync(AggregateRoot aggregate, CancellationToken ct)
         {
-            await _eventStore.SaveEventAsync(aggregate.Id, aggregate.GetUncommittedChanges(), aggregate.Version);
+            await _eventStore.SaveEventAsync(aggregate.Id, aggregate.GetUncommittedChanges(), aggregate.Version, ct);
             aggregate.MarkChangesAsCommitted();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using CQRS.Core.Infrastructure;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Post.Cmd.Api.Commands;
 
@@ -9,19 +10,19 @@ namespace Post.Cmd.Api.Controllers
     public class DeletePostController : ControllerBase
     {
         private readonly ILogger<DeletePostController> _logger;
-        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IMediator _mediator;
 
-        public DeletePostController(ILogger<DeletePostController> logger, ICommandDispatcher commandDispatcher)
+        public DeletePostController(ILogger<DeletePostController> logger, IMediator mediator)
         {
             _logger = logger;
-            _commandDispatcher = commandDispatcher;
+            _mediator = mediator;
         }
 
         [HttpDelete("{postId}")]
-        public async Task<IActionResult> DeletePost(Guid postId, DeletePostCommand command)
+        public async Task<IActionResult> DeletePost(Guid postId, DeletePostCommand command, CancellationToken ct)
         {
             command.Id = postId;
-            await _commandDispatcher.SendAsync(command);
+            await _mediator.Send(command, ct);
 
             return Ok();
         }

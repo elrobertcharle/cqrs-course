@@ -23,24 +23,24 @@ namespace Post.Cmd.Infrastructure.Stores
             _eventProducer = eventProducer;
         }
 
-        public async Task<List<Guid>> GetAggregateIdsAsync()
+        public async Task<List<Guid>> GetAggregateIdsAsync(CancellationToken ct)
         {
-            var events = await _eventStoreRepository.FindAllAsync();
+            var events = await _eventStoreRepository.FindAllAsync(ct);
             return events.Select(e => e.AggregateIdentifier).Distinct().ToList();
         }
 
-        public async Task<List<BaseEvent>> GetEventAsync(Guid aggregateId)
+        public async Task<List<BaseEvent>> GetEventAsync(Guid aggregateId, CancellationToken ct)
         {
-            var events = await _eventStoreRepository.FindByAggregateId(aggregateId);
+            var events = await _eventStoreRepository.FindByAggregateIdAsync(aggregateId, ct);
             if (events == null || !events.Any())
                 throw new AggregateNotFoundException(aggregateId);
 
             return events.OrderBy(e => e.Version).Select(e => e.EventData).ToList();
         }
 
-        public async Task SaveEventAsync(Guid aggregateId, IEnumerable<BaseEvent> events, int expectedLastVersion)
+        public async Task SaveEventAsync(Guid aggregateId, IEnumerable<BaseEvent> events, int expectedLastVersion, CancellationToken ct)
         {
-            var storedEvents = await _eventStoreRepository.FindByAggregateId(aggregateId);
+            var storedEvents = await _eventStoreRepository.FindByAggregateIdAsync(aggregateId, ct);
             if (expectedLastVersion != -1 && storedEvents[^1].Version != expectedLastVersion)
                 throw new ConcurrencyException();
             var version = expectedLastVersion;
@@ -59,7 +59,7 @@ namespace Post.Cmd.Infrastructure.Stores
                     EventData = @event
                 };
 
-                await _eventStoreRepository.SaveAsync(eventModel);
+                await _eventStoreRepository.SaveAsync(eventModel, ct);
                 var topic = Environment.GetEnvironmentVariable("KAFKA_TOPIC");
                 if (topic == null)
                     throw new InvalidOperationException("Topic has not been set. env var KAFKA_TOPIC.");
