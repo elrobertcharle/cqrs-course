@@ -180,7 +180,7 @@ namespace Post.Cmd.Domain.Aggregates
         public void DeletePost(string username)
         {
             if (!_active)
-                throw new InvalidOperationException();
+                return;
 
             if (_author == null)
                 throw new InvalidOperationException();
