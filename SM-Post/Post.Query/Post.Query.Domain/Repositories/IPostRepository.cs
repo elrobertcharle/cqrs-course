@@ -9,13 +9,13 @@ namespace Post.Query.Domain.Repositories
 {
     public interface IPostRepository
     {
-        Task CreateAsync(PostEntity post);
-        Task UpdateAsync(PostEntity post);
-        Task DeleteAsync(Guid postId);
-        Task<PostEntity?> GetByIdAsync(Guid postId);
-        Task<List<PostEntity>> ListAllAsync();
-        Task<List<PostEntity>> ListByAuthorAsync(string author);
-        Task<List<PostEntity>> ListWithLikesAsync(int numberOfLikes);
-        Task<List<PostEntity>> ListWithCommentsAsync();
+        Task CreateAsync(PostEntity post, CancellationToken ct);
+        Task UpdateAsync(PostEntity post, CancellationToken ct);
+        Task DeleteAsync(Guid postId, CancellationToken ct);
+        Task<PostEntity?> GetByIdAsync(Guid postId, CancellationToken ct);
+        Task<List<PostEntity>> ListAllAsync(CancellationToken ct);
+        Task<List<PostEntity>> ListByAuthorAsync(string author, CancellationToken ct);
+        Task<List<PostEntity>> ListWithLikesAsync(int numberOfLikes, CancellationToken ct);
+        Task<List<PostEntity>> ListWithCommentsAsync(CancellationToken ct);
     }
 }

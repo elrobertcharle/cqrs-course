@@ -31,25 +31,25 @@ namespace Post.Query.Infrastructure.Handlers
                 Message = @event.Message
             };
 
-            await _postRepository.CreateAsync(post);
+            await _postRepository.CreateAsync(post, CancellationToken.None);
         }
 
         public async Task On(PostMessageUpdatedEvent @event)
         {
-            var post = await _postRepository.GetByIdAsync(@event.PostId); //roberto: no queda claro que el id del evento sea el id de la entidad. I dont like this
+            var post = await _postRepository.GetByIdAsync(@event.PostId, CancellationToken.None); //roberto: no queda claro que el id del evento sea el id de la entidad. I dont like this
             if (post == null)
                 throw new InvalidOperationException($"The post with Id={@event.PostId} does not exist.");
             post.Message = @event.Message;
-            await _postRepository.UpdateAsync(post);
+            await _postRepository.UpdateAsync(post, CancellationToken.None);
         }
 
         public async Task On(PostLikedEvent @event)
         {
-            var post = await _postRepository.GetByIdAsync(@event.PostId); //roberto: no queda claro que el id del evento sea el id de la entidad. I dont like this
+            var post = await _postRepository.GetByIdAsync(@event.PostId, CancellationToken.None); //roberto: no queda claro que el id del evento sea el id de la entidad. I dont like this
             if (post == null)
                 return;
             post.Likes++;
-            await _postRepository.UpdateAsync(post);
+            await _postRepository.UpdateAsync(post, CancellationToken.None);
         }
 
         public async Task On(CommentAddedEvent @event)
@@ -87,7 +87,7 @@ namespace Post.Query.Infrastructure.Handlers
 
         public async Task On(PostRemovedEvent @event)
         {
-            await _postRepository.DeleteAsync(@event.PostId);
+            await _postRepository.DeleteAsync(@event.PostId, CancellationToken.None);
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using CQRS.Core.Infrastructure;
+using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Post.Query.Api.Database.Entities;
 using Post.Query.Api.Queries;
@@ -6,50 +8,50 @@ using Post.Query.Api.Queries;
 namespace Post.Query.Api.Controllers
 {
     [ApiController]
-    [Route("api/v1/[controller]")]
+    [Route("api/v1/lookup-posts")]
     public class PostLookupController : ControllerBase
     {
         private readonly ILogger<PostLookupController> _logger;
-        private readonly IQueryDispatcher<PostEntity> _queryDispatcher;
+        private readonly IMediator _mediator;
 
-        public PostLookupController(ILogger<PostLookupController> logger, IQueryDispatcher<PostEntity> queryDispatcher)
+        public PostLookupController(ILogger<PostLookupController> logger, IMediator mediator)
         {
             _logger = logger;
-            _queryDispatcher = queryDispatcher;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPost()
+        public async Task<IActionResult> GetAllPost(CancellationToken ct)
         {
-            var posts = await _queryDispatcher.SendAsync(new FindAllPostQuery());
+            var posts = await _mediator.Send(new FindAllPostQuery(), ct);
             return Ok(posts);
         }
 
-        [HttpGet("byId/{postId}")]
-        public async Task<IActionResult> GetByPostId(Guid postId)
+        [HttpGet("{postId}")]
+        public async Task<IActionResult> GetByPostId(Guid postId, CancellationToken ct)
         {
-            var posts = await _queryDispatcher.SendAsync(new FindPostByIdQuery { Id = postId });
+            var posts = await _mediator.Send(new FindPostByIdQuery { Id = postId }, ct);
             return Ok(posts);
         }
 
-        [HttpGet("byAuthor/{author}")]
-        public async Task<IActionResult> GetByAuthor(string author)
+        [HttpGet("by-author")]
+        public async Task<IActionResult> GetByAuthor([FromQuery] string author, CancellationToken ct)
         {
-            var posts = await _queryDispatcher.SendAsync(new FindPostByAuthorQuery { Author = author });
+            var posts = await _mediator.Send(new FindPostByAuthorQuery { Author = author }, ct);
             return Ok(posts);
         }
 
-        [HttpGet("withComments")]
-        public async Task<IActionResult> GetPostsWithComments()
+        [HttpGet("with-comments")]
+        public async Task<IActionResult> GetPostsWithComments(CancellationToken ct)
         {
-            var posts = await _queryDispatcher.SendAsync(new FindPostsWithCommentsQuery());
+            var posts = await _mediator.Send(new FindPostsWithCommentsQuery(), ct);
             return Ok(posts);
         }
 
-        [HttpGet("withLikes/{numberOfLikes}")]  //roberto: I dont like this
-        public async Task<IActionResult> GetPostsWithLikes(int numberOfLikes)
+        [HttpGet("with-likes")]
+        public async Task<IActionResult> GetPostsWithLikes([FromQuery(Name = "likes")] int numberOfLikes, CancellationToken ct)
         {
-            var posts = await _queryDispatcher.SendAsync(new FindPostsWithLikesQuery { NumberOfLikes = numberOfLikes });
+            var posts = await _mediator.Send(new FindPostsWithLikesQuery { NumberOfLikes = numberOfLikes }, ct);
             return Ok(posts);
         }
     }

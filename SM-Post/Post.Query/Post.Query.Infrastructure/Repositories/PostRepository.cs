@@ -20,59 +20,59 @@ namespace Post.Query.Infrastructure.Repositories
             _contextFactory = contextFactory;
         }
 
-        public async Task CreateAsync(PostEntity post)
+        public async Task CreateAsync(PostEntity post, CancellationToken ct)
         {
             using DatabaseContext context = _contextFactory.CreateContext();
             context.Posts.Add(post);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(ct);
         }
 
-        public async Task DeleteAsync(Guid postId)
+        public async Task DeleteAsync(Guid postId, CancellationToken ct)
         {
             using DatabaseContext context = _contextFactory.CreateContext();
-            var post = await GetByIdAsync(postId);
+            var post = await GetByIdAsync(postId, ct);
 
             if (post == null)
                 return;
             context.Posts.Remove(post);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(ct);
         }
 
-        public async Task<PostEntity?> GetByIdAsync(Guid postId)
+        public async Task<PostEntity?> GetByIdAsync(Guid postId, CancellationToken ct)
         {
             using DatabaseContext context = _contextFactory.CreateContext();
-            return await context.Posts.Include(p => p.Comments).FirstOrDefaultAsync(p => p.Id == postId);
+            return await context.Posts.Include(p => p.Comments).FirstOrDefaultAsync(p => p.Id == postId, ct);
         }
 
-        public async Task<List<PostEntity>> ListAllAsync()
+        public async Task<List<PostEntity>> ListAllAsync(CancellationToken ct)
         {
             using DatabaseContext context = _contextFactory.CreateContext();
-            return await context.Posts.AsNoTracking().Include(p => p.Comments).AsNoTracking().ToListAsync();
+            return await context.Posts.AsNoTracking().Include(p => p.Comments).AsNoTracking().ToListAsync(ct);
         }
 
-        public async Task<List<PostEntity>> ListByAuthorAsync(string author)
+        public async Task<List<PostEntity>> ListByAuthorAsync(string author, CancellationToken ct)
         {
             using DatabaseContext context = _contextFactory.CreateContext();
-            return await context.Posts.AsNoTracking().Include(p => p.Comments).AsNoTracking().Where(p => p.Author.Contains(author)).ToListAsync();
+            return await context.Posts.AsNoTracking().Include(p => p.Comments).AsNoTracking().Where(p => p.Author.Contains(author)).ToListAsync(ct);
         }
 
-        public async Task<List<PostEntity>> ListWithCommentsAsync()
+        public async Task<List<PostEntity>> ListWithCommentsAsync(CancellationToken ct)
         {
             using DatabaseContext context = _contextFactory.CreateContext();
-            return await context.Posts.AsNoTracking().Include(p => p.Comments).AsNoTracking().Where(p => p.Comments != null && p.Comments.Any()).ToListAsync();
+            return await context.Posts.AsNoTracking().Include(p => p.Comments).AsNoTracking().Where(p => p.Comments != null && p.Comments.Any()).ToListAsync(ct);
         }
 
-        public async Task<List<PostEntity>> ListWithLikesAsync(int numberOfLikes)
+        public async Task<List<PostEntity>> ListWithLikesAsync(int numberOfLikes, CancellationToken ct)
         {
             using DatabaseContext context = _contextFactory.CreateContext();
-            return await context.Posts.AsNoTracking().Include(p => p.Comments).AsNoTracking().Where(p => p.Likes >= numberOfLikes).ToListAsync();
+            return await context.Posts.AsNoTracking().Include(p => p.Comments).AsNoTracking().Where(p => p.Likes >= numberOfLikes).ToListAsync(ct);
         }
 
-        public async Task UpdateAsync(PostEntity post)
+        public async Task UpdateAsync(PostEntity post, CancellationToken ct)
         {
             using DatabaseContext context = _contextFactory.CreateContext();
             context.Posts.Update(post);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(ct);
         }
     }
 }
