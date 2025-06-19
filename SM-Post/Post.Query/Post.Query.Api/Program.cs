@@ -24,8 +24,6 @@ builder.Services.AddDbContext<Post.Query.Api.Database.DatabaseContext>(configure
 //builder.Services.AddSingleton(new DatabaseContextFactory(configureDbContext));
 builder.Services.AddSingleton(new DatabaseContextFactory(configureDbContextPsql));
 
-var databaseContext = builder.Services.BuildServiceProvider().GetRequiredService<DatabaseContext>();
-
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IEventHandler, Post.Query.Infrastructure.Handlers.EventHandler>();
