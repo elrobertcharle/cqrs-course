@@ -34,47 +34,44 @@ namespace Post.Query.Api.Tests.Tests
         [Fact]
         public async Task GetPostById_ReturnsOk()
         {
-            using (var scope = _appFactory.Services.CreateScope())
+            using var scope = _appFactory.Services.CreateScope();
+            var scopedServices = scope.ServiceProvider;
+            var dbContext = scopedServices.GetRequiredService<DatabaseContext>();
+            var expectedPost = new PostEntity
             {
-                var scopedServices = scope.ServiceProvider;
-                var dbContext = scopedServices.GetRequiredService<DatabaseContext>();
-                var expectedPost = new PostEntity
-                {
-                    Id = Guid.NewGuid(),
-                    Author = "Pepe Martinez",
-                    CreatedDate = DateTime.UtcNow,
-                    Likes = 1,
-                    Message = "This is the post text.",
-                    Comments = new HashSet<CommentEntity>()
-                };
+                Id = Guid.NewGuid(),
+                Author = "Pepe Martinez",
+                CreatedDate = DateTime.UtcNow,
+                Likes = 1,
+                Message = "This is the post text.",
+                Comments = new HashSet<CommentEntity>()
+            };
 
-                dbContext.RemoveRange(dbContext.Posts);
-                dbContext.Posts.Add(expectedPost);
-                await dbContext.SaveChangesAsync();
+            dbContext.RemoveRange(dbContext.Posts);
+            dbContext.Posts.Add(expectedPost);
+            await dbContext.SaveChangesAsync();
 
 
-                var response = await _client.GetAsync($"{_controllerUrl}/{expectedPost.Id}");
-                response.IsSuccessStatusCode.Should().BeTrue();
-                var content = await response.Content.ReadFromJsonAsync<List<PostEntity>>();
-                content.Should().NotBeNull();
-                content.Should().HaveCount(1);
-                var actualPost = content[0];
-                actualPost.Should().BeEquivalentTo(expectedPost, options => options
-                    .Using<DateTime>(ac => ac.Subject.Should().BeCloseTo(ac.Expectation, 1.Seconds()))
-                    .WhenTypeIs<DateTime>());
-            }
+            var response = await _client.GetAsync($"{_controllerUrl}/{expectedPost.Id}");
+            response.IsSuccessStatusCode.Should().BeTrue();
+            var content = await response.Content.ReadFromJsonAsync<List<PostEntity>>();
+            content.Should().NotBeNull();
+            content.Should().HaveCount(1);
+            var actualPost = content[0];
+            actualPost.Should().BeEquivalentTo(expectedPost, options => options
+                .Using<DateTime>(ac => ac.Subject.Should().BeCloseTo(ac.Expectation, 1.Seconds()))
+                .WhenTypeIs<DateTime>());
         }
 
         [Fact]
         public async Task GetByAuthor_Works()
         {
-            using (var scope = _appFactory.Services.CreateScope())
-            {
-                var scopedServices = scope.ServiceProvider;
-                var dbContext = scopedServices.GetRequiredService<DatabaseContext>();
-                var commonAuthor = "Pepe Martinez";
+            var scope = _appFactory.Services.CreateScope();
+            var scopedServices = scope.ServiceProvider;
+            var dbContext = scopedServices.GetRequiredService<DatabaseContext>();
+            var commonAuthor = "Pepe Martinez";
 
-                List<PostEntity> posts = [new PostEntity
+            List<PostEntity> posts = [new PostEntity
                 {
                     Id = Guid.NewGuid(),
                     Author = commonAuthor,
@@ -100,20 +97,19 @@ namespace Post.Query.Api.Tests.Tests
                     Comments = new HashSet<CommentEntity>()
                 }];
 
-                dbContext.RemoveRange(dbContext.Posts);
-                dbContext.Posts.AddRange(posts);
-                await dbContext.SaveChangesAsync();
+            dbContext.RemoveRange(dbContext.Posts);
+            dbContext.Posts.AddRange(posts);
+            await dbContext.SaveChangesAsync();
 
-                var response = await _client.GetAsync($"{_controllerUrl}/by-author?author={commonAuthor}");
-                response.IsSuccessStatusCode.Should().BeTrue();
-                var actualPosts = await response.Content.ReadFromJsonAsync<List<PostEntity>>();
-                actualPosts.Should().NotBeNull();
-                actualPosts.Should().HaveCount(2);
-                var expectedPosts = posts.Take(2);
-                actualPosts.Should().BeEquivalentTo(expectedPosts, options => options
-                    .Using<DateTime>(ac => ac.Subject.Should().BeCloseTo(ac.Expectation, 1.Seconds()))
-                    .WhenTypeIs<DateTime>());
-            }
+            var response = await _client.GetAsync($"{_controllerUrl}/by-author?author={commonAuthor}");
+            response.IsSuccessStatusCode.Should().BeTrue();
+            var actualPosts = await response.Content.ReadFromJsonAsync<List<PostEntity>>();
+            actualPosts.Should().NotBeNull();
+            actualPosts.Should().HaveCount(2);
+            var expectedPosts = posts.Take(2);
+            actualPosts.Should().BeEquivalentTo(expectedPosts, options => options
+                .Using<DateTime>(ac => ac.Subject.Should().BeCloseTo(ac.Expectation, 1.Seconds()))
+                .WhenTypeIs<DateTime>());
         }
     }
 }
