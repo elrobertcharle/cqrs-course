@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Post.Query.Api.Database;
 using Post.Query.Api.Database.Entities;
 using Post.Query.Api.Middleware;
+using Post.Query.Api.Options;
 using Post.Query.Api.Queries;
 //using Post.Query.Domain.Entities;
 using Post.Query.Domain.Repositories;
@@ -16,12 +17,12 @@ using Post.Query.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Action<DbContextOptionsBuilder> configureDbContext = o => o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
-Action<DbContextOptionsBuilder> configureDbContextPsql = o => o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSql"));
+var postgresOptions = new PostgresDbOptions();
+builder.Configuration.GetSection("Db").Bind(postgresOptions);
+var connectionString = PostgresDbOptions.GetConnectionString(postgresOptions);
+Action<DbContextOptionsBuilder> configureDbContextPsql = ob => ob.UseNpgsql(connectionString);
 
-//builder.Services.AddDbContext<DatabaseContext>(configureDbContext);
-builder.Services.AddDbContext<Post.Query.Api.Database.DatabaseContext>(configureDbContextPsql);
-//builder.Services.AddSingleton(new DatabaseContextFactory(configureDbContext));
+builder.Services.AddDbContext<DatabaseContext>(configureDbContextPsql);
 builder.Services.AddSingleton(new DatabaseContextFactory(configureDbContextPsql));
 
 builder.Services.AddScoped<IPostRepository, PostRepository>();
@@ -43,3 +44,5 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

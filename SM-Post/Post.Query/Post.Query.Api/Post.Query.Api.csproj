@@ -25,4 +25,9 @@
     <ProjectReference Include="..\Post.Query.Infrastructure\Post.Query.Infrastructure.csproj" />
   </ItemGroup>
 
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Post.Query.Api.Tests" />
+	</ItemGroup>
+
 </Project>
