@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
-using Post.Query.Consumer.Config;
+﻿using FluentValidation;
+using Post.Query.Consumer.Options;
 
 namespace Post.Query.Consumer.Validators
 {
-    public class KafkaConfigValidator : AbstractValidator<KafkaConfig>
+    public class KafkaOptionsValidator : AbstractValidator<KafkaOptions>
     {
-        public KafkaConfigValidator()
+        public KafkaOptionsValidator()
         {
             RuleFor(x => x.ConsumerConfig).NotNull().DependentRules(() =>
             {

@@ -3,8 +3,9 @@ using CQRS.Core.Events;
 using CQRS.Core.Exceptions;
 using FluentValidation;
 using Microsoft.Extensions.Options;
-using Post.Query.Consumer.Config;
+using Post.Common.Events.JsonConverters;
 using Post.Query.Consumer.Handlers;
+using Post.Query.Consumer.Options;
 using System.Text.Json;
 
 namespace Post.Query.Consumer
@@ -13,9 +14,9 @@ namespace Post.Query.Consumer
     {
         private readonly ILogger<Worker> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly KafkaConfig _kafkaConfig;
+        private readonly KafkaOptions _kafkaConfig;
 
-        public Worker(ILogger<Worker> logger, IServiceScopeFactory ssf, IOptions<KafkaConfig> kafkaConfig, IValidator<KafkaConfig> kafkaConfigValidator)
+        public Worker(ILogger<Worker> logger, IServiceScopeFactory ssf, IOptions<KafkaOptions> kafkaConfig, IValidator<KafkaOptions> kafkaConfigValidator)
         {
             _logger = logger;
             var vr = kafkaConfigValidator.Validate(kafkaConfig.Value);

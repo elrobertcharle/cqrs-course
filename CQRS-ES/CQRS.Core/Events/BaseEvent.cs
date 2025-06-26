@@ -17,10 +17,10 @@ namespace CQRS.Core.Events
         }
 
         [BsonRepresentation(BsonType.String)]
-        public Guid EventId { get; set; } = new Guid();
+        public Guid EventId { get; set; } = Guid.NewGuid();
 
         public int Version { get; set; }
-        
+
         public string Type { get; set; } = null!;
     }
 }

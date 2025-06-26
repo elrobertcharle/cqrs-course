@@ -1,4 +1,5 @@
 ﻿using CQRS.Core.Events;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace CQRS.Core.Domain
     public interface IEventStoreRepository
     {
         Task SaveAsync(EventModel @event, CancellationToken ct);
+        Task SaveAsync(EventModel eventModel, IClientSessionHandle session, CancellationToken ct);
         Task<List<EventModel>> FindByAggregateIdAsync(Guid aggregateId, CancellationToken ct);
         Task<List<EventModel>> FindAllAsync(CancellationToken ct);
     }

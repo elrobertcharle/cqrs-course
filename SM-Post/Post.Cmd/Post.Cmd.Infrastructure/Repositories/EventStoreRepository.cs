@@ -19,7 +19,6 @@ namespace Post.Cmd.Infrastructure.Repositories
         {
             var mongoClient = new MongoClient(config.Value.ConnectionString);
             var mongoDatabase = mongoClient.GetDatabase(config.Value.Database);
-
             _eventStoreCollection = mongoDatabase.GetCollection<EventModel>(config.Value.Collection);
         }
 
@@ -36,6 +35,11 @@ namespace Post.Cmd.Infrastructure.Repositories
         public async Task SaveAsync(EventModel @event, CancellationToken ct)
         {
             await _eventStoreCollection.InsertOneAsync(@event, cancellationToken: ct).ConfigureAwait(false);
+        }
+
+        public async Task SaveAsync(EventModel @event, IClientSessionHandle session, CancellationToken ct)
+        {
+            await _eventStoreCollection.InsertOneAsync(session, @event, cancellationToken: ct).ConfigureAwait(false);
         }
     }
 }

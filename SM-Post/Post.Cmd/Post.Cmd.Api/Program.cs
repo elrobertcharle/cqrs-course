@@ -4,8 +4,13 @@ using CQRS.Core.Events;
 using CQRS.Core.Handlers;
 using CQRS.Core.Infrastructure;
 using CQRS.Core.Producers;
+using FluentValidation;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization;
-using Post.Cmd.Api.Commands;
+using MongoDB.Driver;
+using Post.Cmd.Api;
+using Post.Cmd.Api.Options;
+using Post.Cmd.Api.Validators;
 using Post.Cmd.Domain.Aggregates;
 using Post.Cmd.Infrastructure.Config;
 using Post.Cmd.Infrastructure.Handlers;
@@ -29,13 +34,27 @@ builder.Services.Configure<MongoDbConfig>(builder.Configuration.GetSection(nameo
 builder.Services.Configure<ProducerConfig>(builder.Configuration.GetSection(nameof(ProducerConfig)));
 
 builder.Services.AddScoped<IEventStoreRepository, EventStoreRepository>();
+builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
 builder.Services.AddScoped<IEventStore, EventStore>();
 builder.Services.AddScoped<IEventProducer, EventProducer>();
 builder.Services.AddScoped<IEventSourcingHandler<PostAggregate>, EventSourcingHandler>();
+builder.Services.AddScoped<IOutboxMessageHandler, OutboxMessageHandler>();
+
+builder.Services.AddSingleton<IValidator<KafkaProducerOptions>, KafkaProducerOptionsValidator>();
+builder.Services.AddOptions<KafkaProducerOptions>().Bind(builder.Configuration.GetSection("Kafka"));
+
+
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var config = sp.GetRequiredService<IOptions<MongoDbConfig>>().Value;
+    return new MongoClient(config.ConnectionString);
+});
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
 builder.Services.AddControllers();
+
+builder.Services.AddHostedService<OutboxWorker>();
 
 var app = builder.Build();
 

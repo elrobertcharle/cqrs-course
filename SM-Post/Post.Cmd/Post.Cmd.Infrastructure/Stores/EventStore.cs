@@ -2,25 +2,26 @@
 using CQRS.Core.Events;
 using CQRS.Core.Exceptions;
 using CQRS.Core.Infrastructure;
+using CQRS.Core.Messages;
 using CQRS.Core.Producers;
+using MongoDB.Driver;
 using Post.Cmd.Domain.Aggregates;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Post.Cmd.Infrastructure.Repositories;
+using System.Text.Json;
 
 namespace Post.Cmd.Infrastructure.Stores
 {
     public class EventStore : IEventStore
     {
         private readonly IEventStoreRepository _eventStoreRepository;
-        private readonly IEventProducer _eventProducer;
+        private readonly IMongoClient _mongoClient;
+        private readonly IOutboxRepository _outboxRepository;
 
-        public EventStore(IEventStoreRepository eventStoreRepository, IEventProducer eventProducer)
+        public EventStore(IEventStoreRepository eventStoreRepository, IOutboxRepository outboxRepository, IEventProducer eventProducer, IMongoClient mongoClient)
         {
             _eventStoreRepository = eventStoreRepository;
-            _eventProducer = eventProducer;
+            _mongoClient = mongoClient;
+            _outboxRepository = outboxRepository;
         }
 
         public async Task<List<Guid>> GetAggregateIdsAsync(CancellationToken ct)
@@ -40,30 +41,50 @@ namespace Post.Cmd.Infrastructure.Stores
 
         public async Task SaveEventAsync(Guid aggregateId, IEnumerable<BaseEvent> events, int expectedLastVersion, CancellationToken ct)
         {
-            var storedEvents = await _eventStoreRepository.FindByAggregateIdAsync(aggregateId, ct);
-            if (expectedLastVersion != -1 && storedEvents[^1].Version != expectedLastVersion)
-                throw new ConcurrencyException();
-            var version = expectedLastVersion;
-            foreach (var @event in events)
-            {
-                version++;
-                @event.Version = version;
-                var eventType = @event.GetType().Name;
-                var eventModel = new EventModel
-                {
-                    TimeStamp = DateTime.UtcNow,
-                    AggregateIdentifier = aggregateId,
-                    AggregateType = nameof(PostAggregate),
-                    Version = version,
-                    EventType = eventType,
-                    EventData = @event
-                };
+            using var session = await _mongoClient.StartSessionAsync(cancellationToken: ct);
+            session.StartTransaction();
 
-                await _eventStoreRepository.SaveAsync(eventModel, ct);
-                var topic = Environment.GetEnvironmentVariable("KAFKA_TOPIC");
-                if (topic == null)
-                    throw new InvalidOperationException("Topic has not been set. env var KAFKA_TOPIC.");
-                await _eventProducer.ProduceAsync(topic, @event);
+            try
+            {
+                var storedEvents = await _eventStoreRepository.FindByAggregateIdAsync(aggregateId, ct);
+                if (expectedLastVersion != -1 && storedEvents[^1].Version != expectedLastVersion)
+                    throw new ConcurrencyException();
+                var version = expectedLastVersion;
+                foreach (var @event in events)
+                {
+                    version++;
+                    @event.Version = version;
+                    var eventType = @event.GetType().Name;
+                    var eventModel = new EventModel
+                    {
+                        TimeStamp = DateTime.UtcNow,
+                        AggregateIdentifier = aggregateId,
+                        AggregateType = nameof(PostAggregate),
+                        Version = version,
+                        EventType = eventType,
+                        EventData = @event
+                    };
+
+                    await _eventStoreRepository.SaveAsync(eventModel, session, ct);
+
+                    var outboxMessage = new OutboxMessage
+                    {
+                        AggregateId = aggregateId,
+                        AggregateType = nameof(PostAggregate),
+                        EventType = eventType,
+                        Version = version,
+                        Payload = JsonSerializer.Serialize(@event, @event.GetType())
+                    };
+
+                    await _outboxRepository.AddAsync(outboxMessage, session, ct);
+
+                    await session.CommitTransactionAsync(ct);
+                }
+            }
+            catch
+            {
+                await session.AbortTransactionAsync(ct);
+                throw;
             }
         }
     }
