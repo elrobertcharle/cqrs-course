@@ -11,10 +11,12 @@ namespace Post.Query.Consumer.Handlers
 {
     public class PostCreatedEventHandler : IEventHandler<PostCreatedEvent>
     {
+        private readonly ILogger<PostCreatedEventHandler> _logger;
         private readonly DatabaseContext _dbContext;
 
-        public PostCreatedEventHandler(DatabaseContext dbContext)
+        public PostCreatedEventHandler(ILogger<PostCreatedEventHandler> logger, DatabaseContext dbContext)
         {
+            _logger = logger;
             _dbContext = dbContext;
         }
 

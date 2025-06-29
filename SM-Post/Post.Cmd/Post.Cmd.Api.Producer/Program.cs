@@ -20,7 +20,7 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     return new MongoClient(config.ConnectionString);
 });
 
-//builder.Services.AddHostedService<KafkaOutboxListener>();
+builder.Services.AddHostedService<KafkaOutboxListener>();
 builder.Services.AddHostedService<OutboxPollingWorker>();
 
 var host = builder.Build();
