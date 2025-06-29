@@ -38,7 +38,6 @@ builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
 builder.Services.AddScoped<IEventStore, EventStore>();
 builder.Services.AddScoped<IEventProducer, EventProducer>();
 builder.Services.AddScoped<IEventSourcingHandler<PostAggregate>, EventSourcingHandler>();
-builder.Services.AddScoped<IOutboxMessageHandler, OutboxMessageHandler>();
 
 builder.Services.AddSingleton<IValidator<KafkaProducerOptions>, KafkaProducerOptionsValidator>();
 builder.Services.AddOptions<KafkaProducerOptions>().Bind(builder.Configuration.GetSection("Kafka"));
@@ -53,8 +52,6 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
 builder.Services.AddControllers();
-
-builder.Services.AddHostedService<OutboxWorker>();
 
 var app = builder.Build();
 

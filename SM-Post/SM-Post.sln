@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Post.Common", "Post.Common\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Post.Query.Api.Tests", "Post.Query\Post.Query.Api.Tests\Post.Query.Api.Tests.csproj", "{27577DD2-0432-BE05-0C5C-589A0A067603}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Post.Cmd.Api.Producer", "Post.Cmd\Post.Cmd.Api.Producer\Post.Cmd.Api.Producer.csproj", "{28DE871A-05C5-BEC4-EF8A-2039A4A2D72E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{27577DD2-0432-BE05-0C5C-589A0A067603}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27577DD2-0432-BE05-0C5C-589A0A067603}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27577DD2-0432-BE05-0C5C-589A0A067603}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28DE871A-05C5-BEC4-EF8A-2039A4A2D72E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28DE871A-05C5-BEC4-EF8A-2039A4A2D72E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28DE871A-05C5-BEC4-EF8A-2039A4A2D72E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28DE871A-05C5-BEC4-EF8A-2039A4A2D72E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

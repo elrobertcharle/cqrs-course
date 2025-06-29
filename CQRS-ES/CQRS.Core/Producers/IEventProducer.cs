@@ -1,4 +1,5 @@
-﻿using CQRS.Core.Events;
+﻿using Confluent.Kafka;
+using CQRS.Core.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace CQRS.Core.Producers
 {
     public interface IEventProducer
     {
-        Task ProduceAsync<T>(string topic, T @event) where T : BaseEvent;
+        Task ProduceAsync<T>(string topic, string key, T value) where T : BaseEvent;
+        Task ProduceAsync<TKey, TValue>(string topic, Message<TKey, TValue> message);
     }
 }

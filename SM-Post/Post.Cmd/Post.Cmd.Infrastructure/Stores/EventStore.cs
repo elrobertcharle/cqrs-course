@@ -7,6 +7,7 @@ using CQRS.Core.Producers;
 using MongoDB.Driver;
 using Post.Cmd.Domain.Aggregates;
 using Post.Cmd.Infrastructure.Repositories;
+using Post.Common.Utilities;
 using System.Text.Json;
 
 namespace Post.Cmd.Infrastructure.Stores
@@ -16,12 +17,14 @@ namespace Post.Cmd.Infrastructure.Stores
         private readonly IEventStoreRepository _eventStoreRepository;
         private readonly IMongoClient _mongoClient;
         private readonly IOutboxRepository _outboxRepository;
+        private readonly IEventProducer _eventProducer;
 
         public EventStore(IEventStoreRepository eventStoreRepository, IOutboxRepository outboxRepository, IEventProducer eventProducer, IMongoClient mongoClient)
         {
             _eventStoreRepository = eventStoreRepository;
             _mongoClient = mongoClient;
             _outboxRepository = outboxRepository;
+            _eventProducer = eventProducer;
         }
 
         public async Task<List<Guid>> GetAggregateIdsAsync(CancellationToken ct)
@@ -67,18 +70,23 @@ namespace Post.Cmd.Infrastructure.Stores
 
                     await _eventStoreRepository.SaveAsync(eventModel, session, ct);
 
+                    var KafkaKey = aggregateId.ToString("N");
                     var outboxMessage = new OutboxMessage
                     {
                         AggregateId = aggregateId,
                         AggregateType = nameof(PostAggregate),
                         EventType = eventType,
                         Version = version,
-                        Payload = JsonSerializer.Serialize(@event, @event.GetType())
+                        Payload = JsonSerializer.Serialize(@event, @event.GetType()),
+                        KafkaKey = KafkaKey,
+                        KafkaTopic = "sm-post",
+                        KafkaKeyHash = Murmur2Hasher.Hash(KafkaKey),
                     };
 
                     await _outboxRepository.AddAsync(outboxMessage, session, ct);
 
                     await session.CommitTransactionAsync(ct);
+                    await SendNewOutboxCreatedEvent(aggregateId, outboxMessage.Id);
                 }
             }
             catch
@@ -86,6 +94,25 @@ namespace Post.Cmd.Infrastructure.Stores
                 await session.AbortTransactionAsync(ct);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Notify the producer
+        /// </summary>
+        /// <param name="aggregateId"></param>
+        /// <param name="targetEventId"></param>
+        /// <returns></returns>
+        private async Task SendNewOutboxCreatedEvent(Guid aggregateId, Guid targetEventId)
+        {
+            var newOutboxEventCreated = new NewOutboxCreatedEvent
+            {
+                TargetEventId = targetEventId
+            };
+            await _eventProducer.ProduceAsync("sm-post-outbox", new Confluent.Kafka.Message<string, string>
+            {
+                Key = aggregateId.ToString("N"),
+                Value = JsonSerializer.Serialize(newOutboxEventCreated)
+            });
         }
     }
 }

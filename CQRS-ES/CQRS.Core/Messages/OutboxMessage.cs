@@ -32,5 +32,20 @@ namespace CQRS.Core.Messages
         public bool IsPublished { get; set; } = false;
 
         public DateTime? PublishedAt { get; set; }
+
+        /// <summary>
+        /// This key will be used for send the message to the Kafka topics.
+        /// </summary>
+        public string KafkaKey { get; set; } = null!;
+
+        /// <summary>
+        /// The computed KafkaKey hash, it is useful to determinate which producer should process this outbox message.
+        /// </summary>
+        public int KafkaKeyHash { get; set; }
+
+        /// <summary>
+        /// The producer should send the payload to these topics.
+        /// </summary>
+        public string? KafkaTopic { get; set; }
     }
 }

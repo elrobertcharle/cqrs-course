@@ -51,7 +51,7 @@ namespace Post.Cmd.Infrastructure.Handlers
                 if (topic == null)
                     throw new InvalidOperationException("Topic has not been set. env var KAFKA_TOPIC.");
                 foreach (var @event in events)
-                    await _eventProducer.ProduceAsync(topic, @event);
+                    await _eventProducer.ProduceAsync(topic, aggregateId.ToString("N"), @event);
             }
         }
 

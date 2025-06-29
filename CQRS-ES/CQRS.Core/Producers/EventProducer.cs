@@ -20,20 +20,26 @@ namespace CQRS.Core.Producers
             _config = config.Value;
         }
 
-        public async Task ProduceAsync<T>(string topic, T @event) where T : BaseEvent
+        public async Task ProduceAsync<T>(string topic, string key, T value) where T : BaseEvent
         {
             var producer = new ProducerBuilder<string, string>(_config).Build();
 
             var eventMessage = new Message<string, string>
             {
-                Key = Guid.NewGuid().ToString(), //roberto: mal, se debe usar una key con sentido
-                Value = JsonSerializer.Serialize(@event, @event.GetType())
+                Key = key,
+                Value = JsonSerializer.Serialize(value, value.GetType())
             };
 
-            var deliveryResult = await producer.ProduceAsync(topic, eventMessage);
+            await ProduceAsync(topic, eventMessage);
+        }
+
+        public async Task ProduceAsync<TKey, TValue>(string topic, Message<TKey, TValue> message)
+        {
+            var producer = new ProducerBuilder<TKey, TValue>(_config).Build();
+            var deliveryResult = await producer.ProduceAsync(topic, message);
 
             if (deliveryResult.Status == PersistenceStatus.NotPersisted)
-                throw new Exception($"Could not produce {@event.GetType().Name}. Topic={topic}, due to {deliveryResult.Message}");
+                throw new Exception($"Could not produce message. Topic={topic}, due to {deliveryResult.Message}.");
         }
     }
 }
