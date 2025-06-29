@@ -36,12 +36,12 @@ namespace Post.Cmd.Api.Producer.Handlers
 
     public class OutboxEventHandler : IOutboxEventHandler
     {
-        private readonly ILogger<OutboxPollingWorker> _logger;
+        private readonly ILogger<OutboxEventHandler> _logger;
         private readonly KafkaOptions _kafkaConfig;
         private readonly IMongoCollection<OutboxMessage> _outboxMessagesCollection;
         private readonly OutboxPollingWorkerOptions _outboxPollingWorkerConfig;
 
-        public OutboxEventHandler(ILogger<OutboxPollingWorker> logger, IOptions<KafkaOptions> kafkaConfig, IValidator<KafkaOptions> kafkaConfigValidator, IOptions<MongoDbOptions> mongoDbConfig, IOptions<OutboxPollingWorkerOptions> outboxPollingWorkerConfig)
+        public OutboxEventHandler(ILogger<OutboxEventHandler> logger, IOptions<KafkaOptions> kafkaConfig, IValidator<KafkaOptions> kafkaConfigValidator, IOptions<MongoDbOptions> mongoDbConfig, IOptions<OutboxPollingWorkerOptions> outboxPollingWorkerConfig)
         {
             _logger = logger;
             var vr = kafkaConfigValidator.Validate(kafkaConfig.Value);
@@ -62,8 +62,8 @@ namespace Post.Cmd.Api.Producer.Handlers
             var filterBuilder = Builders<OutboxMessage>.Filter;
             var filter = filterBuilder.Eq(m => m.Id, newOutboxEventCreated.TargetEventId);
 
-            var cursor = await _outboxMessagesCollection.FindAsync(filter, cancellationToken: ct);
-            var l = await cursor.ToListAsync(ct).ConfigureAwait(false);
+            var l = await _outboxMessagesCollection.Find(filter).ToListAsync(ct).ConfigureAwait(false);
+
             var outboxMessage = l.FirstOrDefault();
 
             if (outboxMessage == null)
@@ -71,6 +71,9 @@ namespace Post.Cmd.Api.Producer.Handlers
                 _logger.LogError("OutboxMessage not found. {@NewOutboxEventCreated}", newOutboxEventCreated);
                 return;
             }
+
+            if (outboxMessage.IsPublished)
+                return;
 
             try
             {
@@ -134,6 +137,8 @@ namespace Post.Cmd.Api.Producer.Handlers
                 _logger.LogError("Unable to persist the message in Kafka. {OutboxMessageId}.", outboxMessage.Id);
                 return false;
             }
+
+            _logger.LogDebug("Produced, {outboxMessage.Id}, {outboxMessage.AggregateId}", outboxMessage.Id, outboxMessage.AggregateId);
 
             return true;
         }

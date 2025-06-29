@@ -25,7 +25,7 @@ public class OutboxPollingWorker : BackgroundService
         while (!ct.IsCancellationRequested)
         {
             await outboxMessageHandler.SendPendingAsync(ct);
-            await Task.Delay(5000, ct);
+            await Task.Delay(10000, ct);
         }
     }
 }
