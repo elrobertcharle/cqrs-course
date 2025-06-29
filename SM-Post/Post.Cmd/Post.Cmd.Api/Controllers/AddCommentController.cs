@@ -11,10 +11,10 @@ namespace Post.Cmd.Api.Controllers
     [Route("api/v1/[controller]")]
     public class AddCommentController : ControllerBase
     {
-        private readonly ILogger<EditMessageController> _logger;
+        private readonly ILogger<AddCommentController> _logger;
         private readonly IMediator _mediator;
 
-        public AddCommentController(ILogger<EditMessageController> logger, IMediator mediator)
+        public AddCommentController(ILogger<AddCommentController> logger, IMediator mediator)
         {
             _logger = logger;
             _mediator = mediator;

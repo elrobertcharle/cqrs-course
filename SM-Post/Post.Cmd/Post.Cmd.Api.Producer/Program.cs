@@ -10,6 +10,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddScoped<IOutboxEventHandler, OutboxEventHandler>();
 builder.Services.AddOptions<KafkaOptions>().Bind(builder.Configuration.GetSection("KafkaConfig"));
+builder.Services.AddOptions<OutboxPollingWorkerOptions>().Bind(builder.Configuration.GetSection("OutboxPollingWorkerConfig"));
 builder.Services.AddSingleton<IValidator<KafkaOptions>, KafkaOptionsValidator>();
 builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection("MongoDbConfig"));
 
@@ -19,8 +20,8 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     return new MongoClient(config.ConnectionString);
 });
 
-//builder.Services.AddHostedService<OutboxPollingWorker>();
-builder.Services.AddHostedService<KafkaOutboxListener>();
+//builder.Services.AddHostedService<KafkaOutboxListener>();
+builder.Services.AddHostedService<OutboxPollingWorker>();
 
 var host = builder.Build();
 host.Run();

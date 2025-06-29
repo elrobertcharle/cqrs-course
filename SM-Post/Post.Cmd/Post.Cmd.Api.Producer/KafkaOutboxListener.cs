@@ -18,11 +18,11 @@ namespace Post.Cmd.Api.Producer
 {
     public class KafkaOutboxListener : BackgroundService
     {
-        private readonly ILogger<OutboxPollingWorker> _logger;
+        private readonly ILogger<KafkaOutboxListener> _logger;
         private readonly KafkaOptions _kafkaConfig;
         private IServiceScopeFactory _serviceScopeFactory;
 
-        public KafkaOutboxListener(ILogger<OutboxPollingWorker> logger, IServiceScopeFactory ssf, IOptions<KafkaOptions> kafkaConfig, IValidator<KafkaOptions> kafkaConfigValidator)
+        public KafkaOutboxListener(ILogger<KafkaOutboxListener> logger, IServiceScopeFactory ssf, IOptions<KafkaOptions> kafkaConfig, IValidator<KafkaOptions> kafkaConfigValidator)
         {
             _logger = logger;
             var vr = kafkaConfigValidator.Validate(kafkaConfig.Value);
