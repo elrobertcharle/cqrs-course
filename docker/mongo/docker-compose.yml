@@ -7,10 +7,16 @@ services:
     command: ["--replSet", "rs0", "--bind_ip_all"]  
     volumes:
       - db-data:/data/db
+    networks:
+      - sm-post      
 
 volumes:
   db-data:
     driver: local
+
+networks:
+  sm-post:
+    external: true
 
 # mongosh
 

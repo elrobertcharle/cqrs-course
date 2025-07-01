@@ -1,10 +1,17 @@
 {
   "profiles": {
-    "Post.Cmd.Api.Producer": {
+    "Post.Cmd.Api.Producer.Development": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",
         "WORKER_INDEX": "0"
+      },
+      "dotnetRunMessages": true
+    },
+    "Post.Cmd.Api.Producer.Docker": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Docker"
       },
       "dotnetRunMessages": true
     }

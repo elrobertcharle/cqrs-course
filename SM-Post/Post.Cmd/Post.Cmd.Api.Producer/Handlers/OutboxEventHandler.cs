@@ -40,8 +40,9 @@ namespace Post.Cmd.Api.Producer.Handlers
         private readonly KafkaOptions _kafkaConfig;
         private readonly IMongoCollection<OutboxMessage> _outboxMessagesCollection;
         private readonly OutboxPollingWorkerOptions _outboxPollingWorkerConfig;
+        private readonly int _workerIndex;
 
-        public OutboxEventHandler(ILogger<OutboxEventHandler> logger, IOptions<KafkaOptions> kafkaConfig, IValidator<KafkaOptions> kafkaConfigValidator, IOptions<MongoDbOptions> mongoDbConfig, IOptions<OutboxPollingWorkerOptions> outboxPollingWorkerConfig)
+        public OutboxEventHandler(ILogger<OutboxEventHandler> logger, IOptions<KafkaOptions> kafkaConfig, IValidator<KafkaOptions> kafkaConfigValidator, IOptions<MongoDbOptions> mongoDbConfig, IOptions<OutboxPollingWorkerOptions> outboxPollingWorkerConfig, IConfiguration configuration)
         {
             _logger = logger;
             var vr = kafkaConfigValidator.Validate(kafkaConfig.Value);
@@ -53,10 +54,19 @@ namespace Post.Cmd.Api.Producer.Handlers
             var mongoDatabase = mongoClient.GetDatabase(mongoDbConfig.Value.Database);
             _outboxMessagesCollection = mongoDatabase.GetCollection<OutboxMessage>("outboxMessages");
             _outboxPollingWorkerConfig = outboxPollingWorkerConfig.Value;
+
+            var workerIndexEnvVarName = "WORKER_INDEX";
+            var strWorkerIndex = configuration[workerIndexEnvVarName];
+            if (strWorkerIndex == null)
+                throw new ConfigurationException($"EnvironmentVariable {workerIndexEnvVarName} was not set.");
+            if (!int.TryParse(strWorkerIndex, out _workerIndex))
+                throw new ConfigurationException($"EnvironmentVariable {workerIndexEnvVarName} is invalid.");
         }
 
         public async Task HandleAsync(NewOutboxCreatedEvent newOutboxEventCreated, CancellationToken ct)
         {
+            _logger.LogInformation("Handling newOutboxEventCreated {WORKER_INDEX}", _workerIndex);
+
             var producer = new ProducerBuilder<string, string>(_kafkaConfig.ProducerConfig).Build();
 
             var filterBuilder = Builders<OutboxMessage>.Filter;
@@ -90,17 +100,14 @@ namespace Post.Cmd.Api.Producer.Handlers
 
         public async Task SendPendingAsync(CancellationToken ct)
         {
-            var WorkerIndexEnvVarName = "WORKER_INDEX";
-            var strWorkerIndex = Environment.GetEnvironmentVariable(WorkerIndexEnvVarName);
-            if (strWorkerIndex == null)
-                throw new ConfigurationException($"EnvironmentVariable {WorkerIndexEnvVarName} was not set.");
-            if (!int.TryParse(strWorkerIndex, out var workerIndex))
-                throw new ConfigurationException($"EnvironmentVariable {WorkerIndexEnvVarName} is invalid.");
+
 
             var producer = new ProducerBuilder<string, string>(_kafkaConfig.ProducerConfig).Build();
 
             var filterBuilder = Builders<OutboxMessage>.Filter;
-            var filter = filterBuilder.Eq(m => m.IsPublished, false) & filterBuilder.Mod(m => m.KafkaKeyHash, _outboxPollingWorkerConfig.TotalWorkers, workerIndex);
+            var filter = filterBuilder.Eq(m => m.IsPublished, false)
+                & filterBuilder.Lt(m => m.CreatedAt, DateTime.UtcNow.AddMinutes(-1)) // if the message is 1 min old 
+                & filterBuilder.Mod(m => m.KafkaKeyHash, _outboxPollingWorkerConfig.TotalWorkers, _workerIndex);
             var sortBuilder = Builders<OutboxMessage>.Sort;
             var sort = sortBuilder.Ascending(m => m.CreatedAt);
 
@@ -110,6 +117,7 @@ namespace Post.Cmd.Api.Producer.Handlers
             {
                 try
                 {
+                    _logger.LogInformation("Publishing Event. {WORKER_INDEX}", _workerIndex);
                     if (!await PublishEvent(producer, outboxMessage, ct))
                         break;
                     await SetOutboxMessageAsPublished(outboxMessage.Id, ct);

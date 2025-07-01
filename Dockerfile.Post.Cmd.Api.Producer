@@ -1,0 +1,32 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ./SM-Post/SM-Post.sln ./SM-Post/SM-Post.sln
+COPY ./SM-Post/Post.Cmd/Post.Cmd.Api/Post.Cmd.Api.csproj ./SM-Post/Post.Cmd/Post.Cmd.Api/Post.Cmd.Api.csproj
+COPY ./SM-Post/Post.Cmd/Post.Cmd.Api.Producer/Post.Cmd.Api.Producer.csproj ./SM-Post/Post.Cmd/Post.Cmd.Api.Producer/Post.Cmd.Api.Producer.csproj
+COPY ./SM-Post/Post.Cmd/Post.Cmd.Domain/Post.Cmd.Domain.csproj ./SM-Post/Post.Cmd/Post.Cmd.Domain/Post.Cmd.Domain.csproj
+COPY ./SM-Post/Post.Cmd/Post.Cmd.Infrastructure/Post.Cmd.Infrastructure.csproj ./SM-Post/Post.Cmd/Post.Cmd.Infrastructure/Post.Cmd.Infrastructure.csproj
+COPY ./SM-Post/Post.Common/Post.Common.csproj ./SM-Post/Post.Common/Post.Common.csproj
+COPY ./SM-Post/Post.Query/Post.Query.Api/Post.Query.Api.csproj ./SM-Post/Post.Query/Post.Query.Api/Post.Query.Api.csproj
+COPY ./SM-Post/Post.Query/Post.Query.Api.Database/Post.Query.Api.Database.csproj ./SM-Post/Post.Query/Post.Query.Api.Database/Post.Query.Api.Database.csproj
+COPY ./SM-Post/Post.Query/Post.Query.Api.Tests/Post.Query.Api.Tests.csproj ./SM-Post/Post.Query/Post.Query.Api.Tests/Post.Query.Api.Tests.csproj
+COPY ./SM-Post/Post.Query/Post.Query.Consumer/Post.Query.Consumer.csproj ./SM-Post/Post.Query/Post.Query.Consumer/Post.Query.Consumer.csproj
+COPY ./SM-Post/Post.Query/Post.Query.Domain/Post.Query.Domain.csproj ./SM-Post/Post.Query/Post.Query.Domain/Post.Query.Domain.csproj
+COPY ./SM-Post/Post.Query/Post.Query.Infrastructure/Post.Query.Infrastructure.csproj ./SM-Post/Post.Query/Post.Query.Infrastructure/Post.Query.Infrastructure.csproj
+COPY ./CQRS-ES/CQRS.Core/CQRS.Core.csproj ./CQRS-ES/CQRS.Core/CQRS.Core.csproj
+
+RUN dotnet restore "./SM-Post/SM-Post.sln"
+
+COPY . .
+
+RUN dotnet publish "./SM-Post/Post.Cmd/Post.Cmd.Api.Producer/Post.Cmd.Api.Producer.csproj" -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/runtime:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENV DOTNET_ENVIRONMENT=Docker
+
+ENTRYPOINT ["dotnet", "Post.Cmd.Api.Producer.dll"]
+
+#ENTRYPOINT ["tail", "-f", "/dev/null"]

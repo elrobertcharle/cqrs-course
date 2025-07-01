@@ -1,0 +1,20 @@
+# Exclude build artifacts
+**/bin
+**/obj
+
+.vs
+.git
+.gitignore
+.config
+kafka
+mongo
+psql
+sql-server
+
+.gitattributes
+create sql user.sql
+README.md
+
+# Exclude Docker-related files
+Dockerfile
+.dockerignore

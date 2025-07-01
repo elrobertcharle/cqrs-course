@@ -1,0 +1,20 @@
+services:
+  app1:
+    image: post.cmd.api.producer:1.0
+    container_name: post_cmd_api_producer1
+    environment:
+      - WORKER_INDEX=0
+    networks:
+      - sm-post
+
+  app2:
+    image: post.cmd.api.producer:1.0
+    container_name: post_cmd_api_producer2
+    environment:
+      - WORKER_INDEX=1
+    networks:
+      - sm-post
+
+networks:
+  sm-post:
+    external: true
