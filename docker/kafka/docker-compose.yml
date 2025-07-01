@@ -27,3 +27,8 @@ services:
 networks:
   sm-post:
     external: true      
+
+
+# create partitions for a existing topic : sm-post-outbox
+# /opt/kafka/bin/kafka-topics.sh --bootstrap-server broker:29092 --describe --topic sm-post-outbox
+# /opt/kafka/bin/kafka-topics.sh --bootstrap-server broker:29092 --alter --topic sm-post-outbox --partitions 2
