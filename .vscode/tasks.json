@@ -30,6 +30,16 @@
                 "${workspaceFolder}/SM-Post/Post.Query/Post.Query.Consumer/Post.Query.Consumer.csproj",
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build-Post.Cmd.Api.Producer",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SM-Post/Post.Cmd/Post.Cmd.Api.Producer/Post.Cmd.Api.Producer.csproj",
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }

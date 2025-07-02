@@ -46,6 +46,20 @@
             }
         },
         {
+            "name": "Post.Cmd.Api.Producer",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-Post.Cmd.Api.Producer",
+            "program": "${workspaceFolder}/SM-Post/Post.Cmd/Post.Cmd.Api.Producer/bin/Debug/net9.0/Post.Cmd.Api.Producer.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/SM-Post/Post.Cmd/Post.Cmd.Api.Producer",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development",
+                "KAFKA_TOPIC": "sm-post",
+            }
+        },
+        {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"
@@ -53,7 +67,11 @@
     ],
     "compounds": [
         {
-          "name": "Run All",
+          "name": "Run All (except producer)",
           "configurations": [ "Post.Cmd.Api", "Post.Query.Api", "Post.Query.Consumer"]
+        },
+        {
+          "name": "Run All",
+          "configurations": [ "Post.Cmd.Api", "Post.Query.Api", "Post.Query.Consumer","Post.Cmd.Api.Producer"]
         }]
 }
