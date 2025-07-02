@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-Post.Cmd.Api",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SM-Post/Post.Cmd/Post.Cmd.Api/Post.Cmd.Api.csproj",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build-Post.Query.Api",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SM-Post/Post.Query/Post.Query.Api/Post.Query.Api.csproj",
+            ],
+            "problemMatcher": "$msCompile"
+        }, 
+        {
+            "label": "build-Post.Query.Consumer",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SM-Post/Post.Query/Post.Query.Consumer/Post.Query.Consumer.csproj",
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
