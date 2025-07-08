@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres_duende
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: pass#4o&6
+      POSTGRES_DB: DuendeIS
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_duende_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_duende_data:

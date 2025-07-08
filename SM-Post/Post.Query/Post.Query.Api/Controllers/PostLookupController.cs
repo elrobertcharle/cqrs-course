@@ -1,5 +1,6 @@
 ﻿using CQRS.Core.Infrastructure;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Post.Query.Api.Database.Entities;
@@ -28,6 +29,7 @@ namespace Post.Query.Api.Controllers
         }
 
         [HttpGet("{postId}")]
+        [Authorize("read")]
         public async Task<IActionResult> GetByPostId(Guid postId, CancellationToken ct)
         {
             var posts = await _mediator.Send(new FindPostByIdQuery { Id = postId }, ct);

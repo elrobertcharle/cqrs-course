@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Post.Query.Api.Tests", "Pos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Post.Cmd.Api.Producer", "Post.Cmd\Post.Cmd.Api.Producer\Post.Cmd.Api.Producer.csproj", "{28DE871A-05C5-BEC4-EF8A-2039A4A2D72E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{AF5BEFDA-28AE-7603-040D-593562AC6BD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{28DE871A-05C5-BEC4-EF8A-2039A4A2D72E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28DE871A-05C5-BEC4-EF8A-2039A4A2D72E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28DE871A-05C5-BEC4-EF8A-2039A4A2D72E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF5BEFDA-28AE-7603-040D-593562AC6BD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF5BEFDA-28AE-7603-040D-593562AC6BD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF5BEFDA-28AE-7603-040D-593562AC6BD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF5BEFDA-28AE-7603-040D-593562AC6BD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
