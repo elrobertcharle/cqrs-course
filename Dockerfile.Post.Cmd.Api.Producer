@@ -14,6 +14,7 @@ COPY ./SM-Post/Post.Query/Post.Query.Consumer/Post.Query.Consumer.csproj ./SM-Po
 COPY ./SM-Post/Post.Query/Post.Query.Domain/Post.Query.Domain.csproj ./SM-Post/Post.Query/Post.Query.Domain/Post.Query.Domain.csproj
 COPY ./SM-Post/Post.Query/Post.Query.Infrastructure/Post.Query.Infrastructure.csproj ./SM-Post/Post.Query/Post.Query.Infrastructure/Post.Query.Infrastructure.csproj
 COPY ./CQRS-ES/CQRS.Core/CQRS.Core.csproj ./CQRS-ES/CQRS.Core/CQRS.Core.csproj
+COPY ./SM-Post/IdentityServer/IdentityServer.csproj ./SM-Post/IdentityServer/IdentityServer.csproj
 
 RUN dotnet restore "./SM-Post/SM-Post.sln"
 
