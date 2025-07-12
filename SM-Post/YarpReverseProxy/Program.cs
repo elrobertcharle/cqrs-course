@@ -7,7 +7,7 @@ builder.Services.AddAuthentication()
         options.Authority = "https://localhost:5001";
 
         // This is a crucial security check.
-        options.Audience = "post_query_api"; // <-- IMPORTANT: Change this
+        options.Audience = "post_query_api"; // <-- IMPORTANT roberto: do the same for all audience
         options.TokenValidationParameters.ValidateAudience = false;
     });
 
