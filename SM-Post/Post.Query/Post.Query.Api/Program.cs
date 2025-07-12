@@ -31,6 +31,22 @@ builder.Services.Configure<ConsumerConfig>(builder.Configuration.GetSection(name
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+{
+    options.Authority = "https://localhost:5001";  // roberto: put in config
+    options.TokenValidationParameters.ValidateAudience = false;
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("read", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "post_query_api.read");
+    });
+});
+
+
 builder.Services.AddControllers();
 
 var app = builder.Build();

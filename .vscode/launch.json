@@ -60,6 +60,19 @@
             }
         },
         {
+            "name": "IdentityServer",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-IdentityServer",
+            "program": "${workspaceFolder}/SM-Post/IdentityServer/bin/Debug/net9.0/IdentityServer.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/SM-Post/IdentityServer",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development",
+            }
+        },
+        {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"
@@ -68,10 +81,10 @@
     "compounds": [
         {
           "name": "Run All (except producer)",
-          "configurations": [ "Post.Cmd.Api", "Post.Query.Api", "Post.Query.Consumer"]
+          "configurations": [ "Post.Cmd.Api", "Post.Query.Api", "Post.Query.Consumer","IdentityServer"]
         },
         {
           "name": "Run All",
-          "configurations": [ "Post.Cmd.Api", "Post.Query.Api", "Post.Query.Consumer","Post.Cmd.Api.Producer"]
+          "configurations": [ "Post.Cmd.Api", "Post.Query.Api", "Post.Query.Consumer","Post.Cmd.Api.Producer","IdentityServer"]
         }]
 }

@@ -40,6 +40,16 @@
                 "${workspaceFolder}/SM-Post/Post.Cmd/Post.Cmd.Api.Producer/Post.Cmd.Api.Producer.csproj",
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build-IdentityServer",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SM-Post/IdentityServer/IdentityServer.csproj",
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }
