@@ -14,7 +14,20 @@ builder.Services.AddAuthentication()
 builder.Services.AddAuthorization();
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowNextApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Only if needed
+    });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowNextApp");
 
 app.UseAuthentication();
 app.UseAuthorization();

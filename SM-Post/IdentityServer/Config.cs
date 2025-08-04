@@ -45,13 +45,14 @@ public static class Config
                 ClientSecrets = { new Secret("Abc12345".Sha256()) },
 
                 AllowedGrantTypes = GrantTypes.Code,
+                RequirePkce = true,
 
-                RedirectUris = { "https://localhost:44300/signin-oidc" },
-                FrontChannelLogoutUri = "https://localhost:44300/signout-oidc",
-                PostLogoutRedirectUris = { "https://localhost:44300/signout-callback-oidc" },
+                RedirectUris = { "http://localhost:3000/api/auth/callback/duende" },
+                //FrontChannelLogoutUri = "https://localhost:44300/signout-oidc",
+                PostLogoutRedirectUris = { "http://localhost:3000" },
 
                 AllowOfflineAccess = true,
-                AllowedScopes = { "openid", "profile", "scope2" }
+                AllowedScopes = { "openid", "profile", "post_query_api.read" }
             },
         ];
 }

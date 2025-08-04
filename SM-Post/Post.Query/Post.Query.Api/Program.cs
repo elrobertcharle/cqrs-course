@@ -49,7 +49,20 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowNextApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Only if needed
+    });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowNextApp");
 
 app.UseHttpsRedirection();
 
