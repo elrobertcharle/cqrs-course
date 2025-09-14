@@ -12,14 +12,14 @@ using System.Text.Json;
 
 namespace Post.Cmd.Infrastructure.Stores
 {
-    public class EventStore : IEventStore
+    public class EventStore<TAggregate> : IEventStore where TAggregate : AggregateRoot
     {
-        private readonly IEventStoreRepository _eventStoreRepository;
+        private readonly EventStoreRepository<TAggregate> _eventStoreRepository;
         private readonly IMongoClient _mongoClient;
         private readonly IOutboxRepository _outboxRepository;
         private readonly IEventProducer _eventProducer;
 
-        public EventStore(IEventStoreRepository eventStoreRepository, IOutboxRepository outboxRepository, IEventProducer eventProducer, IMongoClient mongoClient)
+        public EventStore(EventStoreRepository<TAggregate> eventStoreRepository, IOutboxRepository outboxRepository, IEventProducer eventProducer, IMongoClient mongoClient)
         {
             _eventStoreRepository = eventStoreRepository;
             _mongoClient = mongoClient;

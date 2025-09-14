@@ -101,6 +101,8 @@ internal static class HostingExtensions
     /// <param name="app"></param>
     private static void InitializeDatabase(IApplicationBuilder app)
     {
+        DelteAll(app);
+
         using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>()!.CreateScope())
         {
             var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
@@ -139,6 +141,25 @@ internal static class HostingExtensions
                 }
                 context.SaveChanges();
             }
+        }
+    }
+
+    private static void DelteAll(IApplicationBuilder app)
+    {
+        using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>()!.CreateScope())
+        {
+
+            var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+
+            context.ApiResources.RemoveRange(context.ApiResources);
+
+            context.ApiScopes.RemoveRange(context.ApiScopes);
+
+            context.IdentityResources.RemoveRange(context.IdentityResources);
+
+            context.Clients.RemoveRange(context.Clients);
+
+            context.SaveChanges();
         }
     }
 }

@@ -4,6 +4,7 @@ using CQRS.Core.Infrastructure;
 using CQRS.Core.Producers;
 using MongoDB.Driver.Core.Servers;
 using Post.Cmd.Domain.Aggregates;
+using Post.Cmd.Infrastructure.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,20 +14,20 @@ using System.Threading.Tasks;
 
 namespace Post.Cmd.Infrastructure.Handlers
 {
-    public class EventSourcingHandler : IEventSourcingHandler<PostAggregate>
+    public class UploadImageEventSourcingHandler : IEventSourcingHandler<UploadImageAggregate>
     {
         private readonly IEventStore _eventStore;
         private readonly IEventProducer _eventProducer;
 
-        public EventSourcingHandler(IEventStore eventStore, IEventProducer eventProducer)
+        public UploadImageEventSourcingHandler(UploadImageAggregateEventStore eventStore, IEventProducer eventProducer)
         {
             _eventStore = eventStore;
             _eventProducer = eventProducer;
         }
 
-        public async Task<PostAggregate> GetByIdAsync(Guid aggregateId, CancellationToken ct)
+        public async Task<UploadImageAggregate> GetByIdAsync(Guid aggregateId, CancellationToken ct)
         {
-            var aggregate = new PostAggregate();
+            var aggregate = new UploadImageAggregate();
             var events = await _eventStore.GetEventAsync(aggregateId, ct);
 
             if (events == null || !events.Any())
@@ -42,10 +43,6 @@ namespace Post.Cmd.Infrastructure.Handlers
             var aggregateIds = await _eventStore.GetAggregateIdsAsync(ct);
             foreach (var aggregateId in aggregateIds)
             {
-                var aggregate = await GetByIdAsync(aggregateId, ct);
-                if (!aggregate.Active)
-                    continue;
-
                 var events = await _eventStore.GetEventAsync(aggregateId, ct);
                 var topic = Environment.GetEnvironmentVariable("KAFKA_TOPIC");
                 if (topic == null)

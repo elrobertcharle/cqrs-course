@@ -6,12 +6,13 @@ using Post.Cmd.Infrastructure.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Post.Cmd.Infrastructure.Repositories
 {
-    public class EventStoreRepository : IEventStoreRepository
+    public class EventStoreRepository<T> : IEventStoreRepository where T : AggregateRoot
     {
         private readonly IMongoCollection<EventModel> _eventStoreCollection;
 
@@ -19,7 +20,15 @@ namespace Post.Cmd.Infrastructure.Repositories
         {
             var mongoClient = new MongoClient(config.Value.ConnectionString);
             var mongoDatabase = mongoClient.GetDatabase(config.Value.Database);
-            _eventStoreCollection = mongoDatabase.GetCollection<EventModel>(config.Value.Collection);
+
+            var attribute = typeof(T).GetCustomAttribute(typeof(EventStoreCollectionAttribute)) as EventStoreCollectionAttribute;
+
+            if (attribute == null)
+            {
+                throw new InvalidOperationException($"The aggregate type {typeof(T).Name} must have an EventStoreCollectionAttribute.");
+            }
+
+            _eventStoreCollection = mongoDatabase.GetCollection<EventModel>(attribute.CollectionName);
         }
 
         public async Task<List<EventModel>> FindAllAsync(CancellationToken ct)

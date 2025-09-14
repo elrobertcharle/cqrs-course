@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace CQRS.Core.Handlers
 {
-    public interface IEventSourcingHandler<T>
+    public interface IEventSourcingHandler<TAggregate>
     {
         Task SaveAsync(AggregateRoot aggregate, CancellationToken ct);
-        Task<T> GetByIdAsync(Guid aggregateId, CancellationToken ct);
+        Task<TAggregate> GetByIdAsync(Guid aggregateId, CancellationToken ct);
         Task RepublishEventAsync(CancellationToken ct);
     }
 }

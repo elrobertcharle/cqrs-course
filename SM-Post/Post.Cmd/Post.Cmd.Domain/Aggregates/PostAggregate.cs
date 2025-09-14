@@ -3,6 +3,7 @@ using Post.Common.Events;
 
 namespace Post.Cmd.Domain.Aggregates
 {
+    [EventStoreCollection("eventStore")] // only for keep same collection name
     public class PostAggregate : AggregateRoot
     {
         private bool _active;

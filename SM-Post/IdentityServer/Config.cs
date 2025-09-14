@@ -6,22 +6,30 @@ public static class Config
 {
     public static IEnumerable<IdentityResource> IdentityResources =>
         [
-            new IdentityResources.OpenId(),
-            new IdentityResources.Profile(),
+        new IdentityResources.OpenId(),
+        new IdentityResources.Profile(),
         ];
 
+    private const string wgb_query_api_read_scope = "wgb_query_api.read";
+    private const string wgb_command_api_write_scope = "wgb_command_api.write";
     public static IEnumerable<ApiScope> ApiScopes =>
         [
-            new ApiScope("post_query_api.read"),
+        new ApiScope(wgb_query_api_read_scope),
+        new ApiScope(wgb_command_api_write_scope),
         ];
 
     public static IEnumerable<ApiResource> ApiResources =>
         [
-            new ApiResource("post_query_api", "Post Query Api")
-            {
-                Scopes = { "post_query_api.read" },
+        new ApiResource("wgb_query_api", "Query Api")
+        {
+            Scopes = { wgb_query_api_read_scope},
+            // UserClaims = { "role", "email" } // opcional
+        },
+        new ApiResource("wgb_command_api", "Command Api")
+        {
+            Scopes = { wgb_command_api_write_scope },
                 // UserClaims = { "role", "email" } // opcional
-            }
+        }
         ];
 
     public static IEnumerable<Client> Clients =>
@@ -35,10 +43,10 @@ public static class Config
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 ClientSecrets = { new Secret("Abc12345".Sha256()) },
 
-                AllowedScopes = { "post_query_api.read" }
+                AllowedScopes = { wgb_query_api_read_scope, wgb_command_api_write_scope }
             },
 
-            // interactive client using code flow + pkce
+            // interactive user using code flow + pkce
             new Client
             {
                 ClientId = "ui",
@@ -52,7 +60,7 @@ public static class Config
                 PostLogoutRedirectUris = { "http://localhost:3000" },
 
                 AllowOfflineAccess = true,
-                AllowedScopes = { "openid", "profile", "post_query_api.read" }
+                AllowedScopes = { "openid", "profile", wgb_query_api_read_scope, wgb_command_api_write_scope }
             },
         ];
 }

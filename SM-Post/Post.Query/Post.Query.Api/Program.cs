@@ -1,6 +1,7 @@
 using Confluent.Kafka;
 using CQRS.Core.Consumers;
 using CQRS.Core.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Post.Query.Api.Database;
@@ -31,10 +32,11 @@ builder.Services.Configure<ConsumerConfig>(builder.Configuration.GetSection(name
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
-builder.Services.AddAuthentication().AddJwtBearer(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.Authority = "https://localhost:5001";  // roberto: put in config
-    options.TokenValidationParameters.ValidateAudience = false;
+    options.TokenValidationParameters.ValidateAudience = true;
+    options.TokenValidationParameters.ValidAudience = "wgb_query_api";
 });
 
 builder.Services.AddAuthorization(options =>
@@ -42,7 +44,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("read", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", "post_query_api.read");
+        policy.RequireClaim("scope", "wgb_query_api.read");
     });
 });
 
@@ -51,7 +53,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowNextApp", policy =>
+    options.AddPolicy("AllowUIApp", policy =>
     {
         policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
@@ -62,7 +64,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseCors("AllowNextApp");
+app.UseCors("AllowUIApp");
 
 app.UseHttpsRedirection();
 
