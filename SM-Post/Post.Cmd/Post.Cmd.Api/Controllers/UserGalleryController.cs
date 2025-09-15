@@ -26,7 +26,7 @@ namespace Post.Cmd.Api.Controllers
         [HttpPut("image")]
         public async Task<IActionResult> AddImage([FromBody] UploadImageCommand command, CancellationToken ct)
         {
-            var validationResult = await _validator.ValidateAsync(command);
+            var validationResult = await _validator.ValidateAsync(command, ct);
 
             if (!validationResult.IsValid)
             {
